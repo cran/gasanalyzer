@@ -91,6 +91,7 @@ create_equations <- function(useflags = "default", ...) {
       fnRowIdx[i] <- FALSE
     }
   }
+
   if (!any(fnRowIdx == TRUE) || length(useflags) == 0) {
     warning("No valid equations found!\n")
     return(list(NULL))
@@ -314,7 +315,7 @@ recalculate <- function(df, eqs = NULL) {
   nms <- names(eqs)
 
   useflags <- eval(eqs[["gasanalyzer.UseFlags"]])
-  if (length(useflags) == 0) useflags = "default"
+  if (length(useflags) == 0) useflags <- "default"
 
   df <- fixup_import(df, useflags, FALSE)
   eqs[["gasanalyzer.UseFlags"]] <- NULL

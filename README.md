@@ -12,9 +12,9 @@ files, for recalculating data based on sets of pre-defined equations, or based o
 user-specified equations.
 
 ### Installation
-Installing directly from CRAN is the preferred way of installation. I will update this file with a link to CRAN as soon as it has passed the required review.
+GasAnalyzeR can be found on [CRAN](https://cran.r-project.org/package=gasanalyzer), which greatly simplifies installation (if you are using an up-to-date R install, it can for example be found in RStudio under Tools, Install Packages).
 
-It is also possible to install the package from gitlab. Please make sure to run the following command to install all requirements first:
+It is also possible to install the development version of the package from gitlab. Please make sure to run the following command to install all requirements first:
 
 ```r
 install.packages(c("units", "stringi", "jsonify", "xml2", "tidyxl", "tibble", "vctrs", "devtools"))

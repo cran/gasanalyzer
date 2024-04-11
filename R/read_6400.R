@@ -1,9 +1,9 @@
-#' Reads 6400XT text files and creates a tibble with gas-exchange data.
+#' Reads 6400XT text files and creates a tibble with gas-exchange data
 #'
 #' The text files stored by the 6400 contain measured and calculated values that
 #' are read by this function and formatted in a large tibble for use with R.
-#' Constants and metadata are also added as columns. Note that no recalculation of
-#' the gas-exchange parameters is performed, although it is possible to do that using
+#' Constants and metadata are also added as columns. Note that no recalculation
+#' of derived variables is performed, although it is possible to so using
 #' [recalculate()] after importing the data.
 #'
 #' Multiple files can be loaded by calling the function with [lapply()] or
@@ -88,7 +88,7 @@ read_6400_txt <- function(filename, tz = Sys.timezone()) {
   # data start with a number
   datarows <- stri_detect_regex(rawdata,"^[[:digit:]]+\t")
   #add header:
-  datarows[1] = TRUE
+  datarows[1] <- TRUE
 
   if (!any(datarows)) {
     warning("No data rows in ", filename, ".\n")
@@ -118,28 +118,33 @@ read_6400_txt <- function(filename, tz = Sys.timezone()) {
   out <- datamat[-1,] |>
     as_tibble()
 
-  out <- within(out, {
-    SysObs.Instrument <- "6400"
-    SysObs.Filename <-  file_path_sans_ext(basename(filename))
-    SysObs.HHMMSS <- gsub("\"","", get0("SysObs.HHMMSS", ifnotfound = NA))
-    FlrLS.fblue <- as.numeric(get0("Li6400.pctBlue", ifnotfound = NA)) / 100
-    if (exists("Li6400.pctBlue")) rm("Li6400.pctBlue")
-    SysObs.Time <- paste(as.Date(filedate), SysObs.HHMMSS) |>
+  out["SysObs.Instrument"] <- "Li6400"
+  out["SysObs.Filename"] <-  file_path_sans_ext(basename(filename))
+  out["SysObs.HHMMSS"] <- gsub("\"","", g0("SysObs.HHMMSS", NA, envir =
+                                             list2env(out)))
+  out["FlrLS.fblue"] <- g0("Li6400.pctBlue", NA, "%", envir = list2env(out))
+  out["Li6400.pctBlue"] <- NULL
+  out["SysObs.Time"] <- paste(as.Date(filedate), out[["SysObs.HHMMSS"]]) |>
       as.POSIXct(tz = tz)
 
-    SysObs.Date <- as.character(as.Date(SysObs.Time))
-    MchEvent.Time <- SysObs.Time - get0("Li6400.mchElpsd", ifnotfound = NA)
-    #6400 doesn't store fan speeds:
-    Meas.FanSpeed <- NA
-    LTConst.fT1 <- 1.0 - as.numeric(get0("LTConst.fTEB", ifnotfound = "0"))
-    LTConst.fT2 <- 0.0
-    Meas.CO2s <- get0("Meas.CO2s", ifnotfound = NA)
-    GasEx.Ca <- get0("GasEx.Ca", ifnotfound = Meas.CO2s)
-    GasEx.E <- g0("GasEx.Emm", NA, "mol*m^-2*s^-1")
-    LeafQ.Qin <- g0("LeafQ.Qin", get0("Meas.QambIn", ifnotfound = NA),
-                    "\U00B5mol*m^-2*s^-1")
-  })
+  out["SysObs.Date"] <- as.character(as.Date(out[["SysObs.Time"]]))
+  out["MchEvent.Time"] <- out["SysObs.Time"] - g0("Li6400.mchElpsd", NA_real_,
+                                                  envir = list2env(out))
+  #6400 doesn't store fan speeds:
+  out["Meas.FanSpeed"] <- NA
+  out["LTConst.fTEB"] <- g0("LTConst.fTEB", 0, "1", envir = list2env(out))
+  out["LTConst.fT1"] <- set_units(1, "1") - out[["LTConst.fTEB"]]
+  out["LTConst.fT2"] <- set_units(0, "1")
+  out["Meas.CO2s"] <- g0("Meas.CO2s", NA, "\U00B5mol*mol^-1",
+                         envir = list2env(out))
+  out["GasEx.Ca"] <- g0("GasEx.Ca", out[["Meas.CO2s"]], "\U00B5mol*mol^-1",
+                        envir = list2env(out))
 
+  out["GasEx.E"] <- g0("GasEx.Emm", NA, "mol*m^-2*s^-1",
+                       envir = list2env(out)) / 1000
+  out["LeafQ.Qin"] <- g0("LeafQ.Qin", g0("Meas.QambIn", NA_real_,
+                                         envir = list2env(out)),
+                         "\U00B5mol*m^-2*s^-1", envir = list2env(out))
 
   out <- fixup_import(out)
 

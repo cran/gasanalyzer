@@ -7,12 +7,13 @@ Biochimica
 Biophysica
 Biosciences
 Briantais
+CIRAS
 Caemmerer
-Celcius
 ESS
 Ely
 Farquhar
 GFS
+GasAnalyzeR
 GasanalyzeR
 Genty
 GmbH
@@ -21,6 +22,7 @@ JA
 KJ
 Lamour
 Loreto
+MSF
 Mailund
 Mesophyll
 Márquez
@@ -33,6 +35,7 @@ Physiol
 Phytol
 Planta
 Putten
+RStudio
 Roback
 Rtools
 Sharkey
@@ -48,12 +51,14 @@ bw
 carboxylation
 cmax
 coercible
+csv
 cuticula
 cuticular
 datetime
 der
 df
 doi
+dontrun
 ecoinf
 ecophysiologists
 eqs
@@ -80,6 +85,7 @@ plotmath
 porometer
 pre
 quosures
+resubmission
 stomatal
 subfolders
 sw

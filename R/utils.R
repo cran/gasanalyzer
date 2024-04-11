@@ -15,9 +15,9 @@
 #' @importFrom units set_units
 #' @noRd
 "@" <- function(x, y = ".") {
-    ys = substitute(y)
+    ys <- substitute(y)
     if (!isS4(x)) {
-      if (exists(deparse(ys), parent.frame(1)) && is.character(y)) ys = y[1]
+      if (exists(deparse(ys), parent.frame(1)) && is.character(y)) ys <- y[1]
       if (ys == ".") as.numeric(x) else {
         storage.mode(x) <- "numeric"
         set_units(x, ys, mode="standard")
@@ -194,9 +194,12 @@ sort_names <- function(nms) {
 rename_header <- function(x, nm) {
 
   idx <- x %in% .gasanalyzerEnv$vars[[nm]]
-  x[idx] <- .gasanalyzerEnv$vars[["fullname"]][match(x,.gasanalyzerEnv$vars[[nm]], 0)]
+  x[idx] <- .gasanalyzerEnv$vars[["fullname"]][match(x,
+                                                     .gasanalyzerEnv$vars[[nm]],
+                                                     0)]
   # only replace funny symbols in the rest:
-  x[!idx] <-   stri_replace_all_fixed(x[!idx], .gasanalyzerEnv$sympairs[c(T, F)],
+  x[!idx] <-   stri_replace_all_fixed(x[!idx],
+                                      .gasanalyzerEnv$sympairs[c(T, F)],
                                       .gasanalyzerEnv$sympairs[c(F, T)],
                                       vectorise_all = F)
 
@@ -359,7 +362,7 @@ pwapprox <- function(x, y , z) {
         yvals <- y[c(known_i[i], known_i[i+1])]
 
         xout <- x[known_i[i]:(known_i[i+1]-1)]
-        y[known_i[i]:(known_i[i+1]-1)] = approx(xvals, yvals, xout,rule = 2)$y
+        y[known_i[i]:(known_i[i+1]-1)] <- approx(xvals, yvals, xout,rule = 2)$y
     }
     y
 }
@@ -458,15 +461,34 @@ tsort <- function(nm, deps) {
 #' @param na_replace treat NA values as not existing. Defaults to FALSE.
 #'
 #' @noRd
-g0 <- function(x, ifnotfound = 0, un = NULL, na_replace = F) {
+g0 <- function(x, ifnotfound = 0, un = NULL, na_replace = FALSE,
+               envir = parent.frame(1)) {
 
-  x <- get0(substitute(x), envir = parent.frame(1), ifnotfound = ifnotfound)
+  x <- get0(substitute(x), envir = envir, ifnotfound = ifnotfound)
 
   if (na_replace) x[is.na(x)] <- ifnotfound
   if (length(un) == 0) return(x)
   #this doesn't change units class objects, so better than as.numeric:
   storage.mode(x) <- "numeric"
   set_units(x, un, mode = "standard")
+}
+
+#' Helper function to rename columns
+#'
+#' @param df a data.frame or tibble
+#' @param old_names character vector with names of columns that are potentially
+#'   in df, and should be renamed
+#' @param new_names the new names for the columns. Needs to be a character
+#'   vector with the same length as old_names
+#'
+#' @returns a data.frame or tibble with changed names
+#' @noRd
+rename_cols <- function(df, old_names, new_names) {
+  nms <- colnames(df)
+  ex_nms <- old_names[old_names %in% nms]
+
+  colnames(df)[match(ex_nms, nms)] <- new_names[match(ex_nms, old_names)]
+  df
 }
 
 #' Use the water mol fractions to back-calculate O2 concentrations for
@@ -489,13 +511,14 @@ gfs_calc_o2 <- function(H2O, wa, mp, zp) {
   # Similarly, for 20% O2, values from 20.942 seem to be reused.
   # I used a linear fit (fit is near perfect) of the factor against O2 to find
   # the slopes at key H2O levels
-  o2cal = data.frame(
+  o2cal <- data.frame(
     h2o = c(0, 1000, 5000, 10000, 15000, 20000, 30000, 45000, 75000),
     o = c(1, 0.99, 0.966, 0.955, 0.949, 0.946, 0.941, 0.933, 0.928),
     s = c(0, 4.775096e-04, 1.623532e-03, 2.148791e-03, 2.435297e-03,
           2.57855e-03,  2.817305e-03, 3.199313e-03, 3.438067e-03))
-  H2O <- as.numeric(H2O)
-  H2Of = as.numeric(wa) / (as.numeric(mp) - as.numeric(zp) + H2O)
+  H2O <- as.numeric(set_units(H2O, "umol/mol"))
+  H2Of <- as.numeric(set_units(wa, "umol/mol")) /
+    (as.numeric(mp) - as.numeric(zp) + H2O)
   if (any(H2Of > 1.01 | H2Of < 0.90, na.rm = T))
     warning ("Unlikely values for calculating O2 concentration.")
 
@@ -528,14 +551,14 @@ gfs_o2_factor <- function(H2O, O2) {
   # Similarly, for 20% O2, values from 20.942 seem to be reused.
   # I used a linear fit (fit is near perfect) of the factor against O2 to find
   # the slopes at key H2O levels
-  o2cal = data.frame(
+  o2cal <- data.frame(
     h2o = c(0, 1000, 5000, 10000, 15000, 20000, 30000, 45000, 75000),
     o = c(1, 0.99, 0.966, 0.955, 0.949, 0.946, 0.941, 0.933, 0.928),
     s = c(0, 4.775096e-04, 1.623532e-03, 2.148791e-03, 2.435297e-03,
           2.57855e-03,  2.817305e-03, 3.199313e-03, 3.438067e-03))
 
-  O2 <- as.numeric(O2)
-  H2O <- as.numeric(H2O)
+  O2 <- as.numeric(set_units(O2, "%"))
+  H2O <- as.numeric(set_units(H2O, "umol/mol"))
 
   if (any(O2 > 21, na.rm = T))
     warning ("No calibration data available for O2 levels above 21%.")

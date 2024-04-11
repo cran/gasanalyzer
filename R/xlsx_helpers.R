@@ -74,8 +74,8 @@ pi_xl <- function() return(pi)
 #'
 #' @noRd
 getXLrefs <- Vectorize(function(formula, addr, nm) {
-    t <- xlex(formula);
-    rf <- unique(t$token[t$type == "ref"]);
+    t <- xlex(formula)
+    rf <- unique(t$token[t$type == "ref"])
     list(refs = rf, derefs = nm[match(rf, addr)])
 }, vectorize.args="formula", USE.NAMES = F)
 

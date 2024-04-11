@@ -17,7 +17,8 @@
 #'   1 &\text{if } \mathrm{Leak.Leak} \cdot \mathrm{LeakConst.leak\_wt}
 #'   >= \mathrm{Leak.Fan} \\
 #'   \frac{\mathrm{Leak.Fan}}{\mathrm{Leak.Fan} - \mathrm{Leak.Leak} \cdot
-#'   \mathrm{LeakConst.leak\_wt}} &\text{if } \mathrm{Leak.Leak} \cdot \mathrm{LeakConst.leak\_wt}
+#'   \mathrm{LeakConst.leak\_wt}} &\text{if } \mathrm{Leak.Leak} \cdot
+#'   \mathrm{LeakConst.leak\_wt}
 #'   < \mathrm{Leak.Fan} \end{cases}}
 #'
 #' @returns A list of supported computations.
@@ -93,7 +94,7 @@ calcs <- function() {
           QConst.fQambIn * g0(Meas.QambIn, 0, '\U00B5mol*m^-2*s^-1') +
             QConst.fQambOut * g0(Meas.QambOut, 0, '\U00B5mol*m^-2*s^-1') +
             QConst.fQflr * g0(FlrLS.Q, 0, '\U00B5mol*m^-2*s^-1') *
-              (1 - g0(FlrLS.ffarred)) +
+              (1@"1" - g0(FlrLS.ffarred, 0, "1")) +
             QConst.fQheadLS * g0(HeadLS.Q, 0, '\U00B5mol*m^-2*s^-1') +
             QConst.fQconsoleLS *
               g0(ConsoleLS.Q, 0, '\U00B5mol*m^-2*s^-1')
@@ -114,13 +115,27 @@ calcs <- function() {
       default = list(
         desc = "",
         deps = "",
-        fn = function () { g0(LeafQ.alpha, LQConst.AbsAmbient) }),
+        fn = function() { g0(LeafQ.alpha, LQConst.AbsAmbient) }
+      ),
+      ciras4 = list(
+        desc = "",
+        deps = "",
+        fn = function() {
+          # currently only light source weighted, not spectrum weighted
+            ((g0(QConst.fQambIn) * g0(LQConst.AbsAmbient) +
+               g0(QConst.fQambOut) * g0(LQConst.AbsAmbient) +
+               g0(QConst.fQflr) * g0(LQConst.RedAbsFlr) +
+               g0(QConst.fQheadLS) * g0(LQConst.RedAbsLED)) /
+            (g0(QConst.fQambIn) + g0(QConst.fQambOut) +
+               g0(QConst.fQflr) + g0(QConst.fQheadLS)))@.
+        }
+      ),
       li6400 = list(
         desc = "Li6400 specific, spectrum-weighted version.",
         deps = "",
-        fn = function () {
-          g0(FlrLS.fblue, NA) * g0(LQConst.BlueAbsFlr, 0.85) +
-            (1 - g0(FlrLS.fblue, NA)) * g0(LQConst.RedAbsFlr, 0.85)
+        fn = function() {
+          (g0(FlrLS.fblue, NA, "1") * g0(LQConst.BlueAbsFlr, 0.85) +
+            (1@"1" - g0(FlrLS.fblue, NA, "1")) * g0(LQConst.RedAbsFlr, 0.85))@.
         }
       ),
       li6800 = list(
@@ -134,10 +149,10 @@ calcs <- function() {
           flr <- ((g0(FlrLS.Qred, 0, un) + g0(FlrLS.Qmodavg, 0, un)) /
                     rb * LQConst.RedAbsFlr + g0(FlrLS.Qblue, 0, un) /
                     rb * LQConst.BlueAbsFlr)@.
-          hls <- (g0(HeadLS.fred, 0, un) * LQConst.RedAbsLED +
-                    g0(HeadLS.fgreen, 0, un) * LQConst.GreenAbsLED +
-                    g0(HeadLS.fblue, 0, un) * LQConst.BlueAbsLED +
-                    g0(HeadLS.fwhite, 0, un) * LQConst.WhiteAbsLED)@.
+          hls <- (g0(HeadLS.fred, 0, "1") * LQConst.RedAbsLED +
+                    g0(HeadLS.fgreen, 0, "1") * LQConst.GreenAbsLED +
+                    g0(HeadLS.fblue, 0, "1") * LQConst.BlueAbsLED +
+                    g0(HeadLS.fwhite, 0, "1") * LQConst.WhiteAbsLED)@.
           ((QConst.fQambIn * LQConst.AbsAmbient +
               QConst.fQambOut * LQConst.AbsAmbient +
               QConst.fQflr * flr + QConst.fQheadLS * hls) /
@@ -148,10 +163,23 @@ calcs <- function() {
     ),
     LeafQ.Conv = list(
       default = list(
-        desc = paste0(""),
+        desc = "",
         deps = "",
         fn = function() { g0(LeafQ.Conv, g0(ConvAmbient, 0.19),
                              "J*\U00B5mol^-1")
+        }
+      ),
+      ciras4 = list(
+        desc = "",
+        deps = "",
+        fn = function() {
+          # currently only light source weighted, not spectrum weighted
+            ((g0(QConst.fQambIn) * g0(LQConst.ConvAmbient) +
+               g0(QConst.fQambOut) * g0(LQConst.ConvAmbient) +
+               g0(QConst.fQflr) * g0(LQConst.RedConvFlr) +
+               g0(QConst.fQheadLS) * g0(LQConst.RedConvLED)) /
+            (g0(QConst.fQambIn) + g0(QConst.fQambOut) +
+               g0(QConst.fQflr) + g0(QConst.fQheadLS)))@'J*\U00B5mol^-1'
         }
       ),
       li6800 = list(
@@ -169,15 +197,15 @@ calcs <- function() {
                rb * LQConst.RedConvFlr + g0(FlrLS.Qblue, 0, un) / rb *
                LQConst.BlueConvFlr)
           led <- QConst.fQheadLS *
-            (g0(HeadLS.fred, 0) * LQConst.RedConvLED +
-               g0(HeadLS.fgreen, 0) * LQConst.GreenConvLED +
-               g0(HeadLS.fblue, 0) * LQConst.BlueConvLED +
-               g0(HeadLS.fwhite, 0) * LQConst.WhiteConvLED)
+            (g0(HeadLS.fred) * LQConst.RedConvLED +
+               g0(HeadLS.fgreen) * LQConst.GreenConvLED +
+               g0(HeadLS.fblue) * LQConst.BlueConvLED +
+               g0(HeadLS.fwhite) * LQConst.WhiteConvLED)
           con <- QConst.fQconsoleLS *
-            (g0(ConsoleLS.fred, 0) * LQConst.RedConvLED +
-               g0(ConsoleLS.fgreen, 0) * LQConst.GreenConvLED +
-               g0(ConsoleLS.fblue, 0) * LQConst.BlueConvLED +
-               g0(ConsoleLS.fwhite, 0) * LQConst.WhiteConvLED)
+            (g0(ConsoleLS.fred) * LQConst.RedConvLED +
+               g0(ConsoleLS.fgreen) * LQConst.GreenConvLED +
+               g0(ConsoleLS.fblue) * LQConst.BlueConvLED +
+               g0(ConsoleLS.fwhite) * LQConst.WhiteConvLED)
           ((am + flr + led + con) /
               (QConst.fQambIn + QConst.fQambOut + QConst.fQflr +
                  QConst.fQheadLS + QConst.fQconsoleLS))@'J*\U00B5mol^-1'
@@ -252,9 +280,9 @@ calcs <- function() {
         deps = "",
         fn = function() {
           (ifelse(substr(Const.Geometry, 1, 1) == '0',
-                  { fpo = (Meas.FanSpeed@'krpm' * Meas.Pa /
+                  { fpo <- (Meas.FanSpeed@'krpm' * Meas.Pa /
                     ChambConst.PoBLC)@.
-                  mmS = (pmax(pmin(Const.S, ChambConst.SmaxBLC),
+                  mmS <- (pmax(pmin(Const.S, ChambConst.SmaxBLC),
                               ChambConst.SminBLC))@'cm^2'@.
                   ChambConst.CFaBLC + fpo * (ChambConst.CFbBLC +
                                               ChambConst.CFcBLC *
@@ -270,13 +298,14 @@ calcs <- function() {
         deps = "",
         fn = function() {
           # Based on a fit of data provided by the vendor for MEBA191A
+          # Note the value is divided by 2 because we define gb as one-sided
           # Area correction is WIP and not yet here (there are issues)
           # FIXME: depend on chamber type?
-          imp <- pmax(1, Meas.FanSpeed@steps@.);
+          imp <- pmax(1, Meas.FanSpeed@steps@.)
           if (any(Const.S@'cm^2'@. != 8))
             warning('\n  No area correction for gbw is ',
                     'currently implemented.\n')
-          ((-52.2029 * imp^2 + 1161.15 * imp - 538.845) / 1000)@'mol*m^-2*s^-1'
+          ((-52.2029 * imp^2 + 1161.15 * imp - 538.845) / 2000)@'mol*m^-2*s^-1'
         }
       )
     ),
@@ -500,7 +529,7 @@ calcs <- function() {
                       "sensors or measured with the leaf thermocouple ",
                       "if it is not touching the leaf in energy-balance mode."),
         deps = "",
-        fn = function() { (ifelse(LTConst.fTEB, Meas.Tleaf,
+        fn = function() { (ifelse(LTConst.fTEB@., Meas.Tleaf,
                                   (Meas.Tleaf + Meas.Tair) / 2))@'degC' }
       )
     ),
@@ -596,10 +625,11 @@ calcs <- function() {
                    Meas.H2Os) / (unity + GasEx.E / (4 * GasEx.gbw))
           Es <- GasEx.E - Const.gcw * (wi - ws)
           gtw_up <- (1 / ((wi - ws) * (1 + Const.K) /
-                            (GasEx.E - Es * (wi + ws) / 2) + 1 / GasEx.gbw))
+                            (GasEx.E - Es * (wi + ws) / 2) +
+                            1 / (2 * GasEx.gbw)))
           gtw_low <- (Const.K / ((wi - ws) * (1 + Const.K) /
                                    (GasEx.E - Es * (wi + ws) / 2) +
-                                   Const.K / GasEx.gbw))
+                                   Const.K / (2 * GasEx.gbw)))
           (gtw_up + gtw_low)@'mol*m^-2*s^-1'
         }
       )
@@ -654,7 +684,7 @@ calcs <- function() {
           # of Marquez et al. 2021
           gl <- GasEx.gsw / 1.6 + Const.gcc
           gb <- GasEx.gbw / (1.6)^(2 / 3)
-          k <- pmin(Const.K, 1e-8)
+          k <- pmax(Const.K, 1e-12)
           1 / (1 / gb + (1 + k) / gl) + k / (k / gb + (1 + k) / gl)
         }
       ),
@@ -701,7 +731,7 @@ calcs <- function() {
       default = list(
         desc = "",
         deps = "",
-        fn = function () {GasEx.Ci / GasEx.Ca}
+        fn = function() {GasEx.Ci / GasEx.Ca}
       )
     ),
     GasEx.pCi = list(
@@ -720,7 +750,7 @@ calcs <- function() {
         fn = function() {
           #FIXME: error on missing cal? or Raw?
           hc <- get_cal(SysConst.UserCal, SysConst.FactCal)
-          ab <- span_abs(hc, 'h2o', 'a', Meas.Pa, Raw.H2OaAbs);
+          ab <- span_abs(hc, 'h2o', 'a', Meas.Pa, Raw.H2OaAbs)
           (abs2frac(hc, 'h2o', 'a', ab) * Status.Ts@"K" *
              psiH2O(hc, SysConst.Oxygen@'%'))@'mmol*mol^-1'
         }
@@ -749,6 +779,31 @@ calcs <- function() {
       )
     ),
     Meas.H2Or = list(
+      raw.li6400 = list(
+        desc = "",
+        deps = "",
+        fn = function() {
+          warning("Calculating mole fractions from raw values not yet ",
+                  "implemented.")
+          Meas.H2Or
+          }
+      ),
+      raw.ciras4 = list(
+        desc = "",
+        deps = "",
+        fn = function() {
+          warning("Calculating mole fractions from raw values not possible.")
+          Meas.H2Or
+        }
+      ),
+      raw.gfs3000 = list(
+        desc = "",
+        deps = "match",
+        fn = function() {
+          warning("Calculating mole fractions from raw values not possible.")
+          Meas.H2Or
+        }
+      ),
       raw.li6800 = list(
         desc = paste0("Li6800 specific version that uses raw absorption",
                       "values and accounts for the effect of oxygen, ",
@@ -760,6 +815,22 @@ calcs <- function() {
           ab <- span_abs(hc, 'h2o', 'b', Meas.Pa, Raw.H2OrAbs)
           (abs2frac(hc, 'h2o', 'b', ab) * Status.Tr@"K" *
               psiH2O(hc, SysConst.Oxygen@'%'))@'mmol*mol^-1'
+        }
+      ),
+      O2_correction.li6400 = list(
+        desc = "",
+        deps = "",
+        fn = function() {
+          warning("O2 corrections for Li6400 are not yet implemented.")
+          Meas.H2Or
+        }
+      ),
+      O2_correction.ciras4 = list(
+        desc = "",
+        deps = "",
+        fn = function() {
+          warning("O2 corrections for CIRAS4 are not yet implemented.")
+          Meas.H2Or
         }
       ),
       O2_correction.li6800 = list(
@@ -924,7 +995,7 @@ calcs <- function() {
       default = list(
         desc = "",
         deps = "",
-        fn = function () {
+        fn = function() {
           g0(FLR.QinFs, LeafQ.Qin, '\U00B5mol*m^-2*s^-1') * LeafQ.alpha
         }
       )
@@ -945,6 +1016,51 @@ calcs <- function() {
         fn = function() { (g0(FLR.Fm, NA) - g0(FLR.Fmp, NA)) /
             g0(FLR.Fmp, NA)
           }
+      )
+    ),
+    FLR.qN = list(
+      default = list(
+        desc = "",
+        deps = "",
+        fn = function() { (g0(FLR.Fm, NA) - g0(FLR.Fmp, NA)) /
+            (g0(FLR.Fm, NA) - g0(FLR.Fop, NA))
+        }
+      )
+    ),
+    FLR.qNFo = list(
+      default = list(
+        desc = "",
+        deps = "",
+        fn = function() { (g0(FLR.Fm, NA) - g0(FLR.Fmp, NA)) /
+            (g0(FLR.Fm, NA) - g0(FLR.Fo, NA))
+        }
+      )
+    ),
+    FLR.qP = list(
+      default = list(
+        desc = "",
+        deps = "",
+        fn = function() { (g0(FLR.Fmp, NA) - g0(FLR.Fs, NA)) /
+            (g0(FLR.Fmp, NA) - g0(FLR.Fop, NA))
+        }
+      )
+    ),
+    FLR.qPFo = list(
+      default = list(
+        desc = "",
+        deps = "",
+        fn = function() { (g0(FLR.Fmp, NA) - g0(FLR.Fs, NA)) /
+            (g0(FLR.Fmp, NA) - g0(FLR.Fo, NA))
+        }
+      )
+    ),
+    FLR.qL = list(
+      default = list(
+        desc = "",
+        deps = "",
+        fn = function() { g0(FLR.qP, NA) * g0(FLR.Fop, NA) /
+            g0(FLR.Fs, NA)
+        }
       )
     ),
     FLR.PhiQin_4 = list(
@@ -1144,6 +1260,53 @@ calcs <- function() {
         desc = "",
         deps = "",
         fn = function() { TRUE }
+      )
+    ),
+    SysObs.Instrument = list(
+      default = list(
+        desc = "",
+        deps = "",
+        fn = function() { g0(SysObs.Instrument, NA) }
+      ),
+      li6400 = list(
+        desc = "",
+        deps = "",
+        fn = function() {
+          inst <- g0(SysObs.Instrument, NA)
+          if (!isTRUE(all(SysObs.Instrument == "Li6400")))
+            warning('\n  Applying Li6400 specific calculations to ',
+                    'rows not measured by an Li6400.\n')
+          inst }
+      ),
+      li6800 = list(
+        desc = "",
+        deps = "",
+        fn = function() {
+          inst <- g0(SysObs.Instrument, NA)
+          if (!isTRUE(all(SysObs.Instrument == "Li6800")))
+            warning('\n  Applying Li6800 specific calculations to ',
+                    'rows not measured by an Li6800.\n')
+          inst }
+      ),
+      gfs3000 = list(
+        desc = "",
+        deps = "",
+        fn = function() {
+          inst <- g0(SysObs.Instrument, NA)
+          if (!isTRUE(all(SysObs.Instrument == "GFS3000")))
+            warning('\n  Applying GFS3000 specific calculations to ',
+                    'rows not measured by a GFS3000.\n')
+          inst }
+      ),
+      ciras4 = list(
+        desc = "",
+        deps = "",
+        fn = function() {
+          inst <- g0(SysObs.Instrument, NA)
+          if (!isTRUE(all(SysObs.Instrument == "CIRAS4")))
+            warning('\n  Applying CIRAS4 specific calculations to ',
+                    'rows not measured by a CIRAS4.\n')
+          inst }
       )
     )
   ))

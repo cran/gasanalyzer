@@ -34,9 +34,8 @@ attribute.
 \description{
 The text files stored by the GFS-3000 contain measured and calculated values
 that are read by this function and formatted in a large tibble for use with
-R. Note that no recalculation of the gas-exchange parameters is
-performed, although it is possible to do that using \code{\link[=recalculate]{recalculate()}} after
-importing the data.
+R. Note that no recalculation of derived variables is performed, although it
+is possible to do so using \code{\link[=recalculate]{recalculate()}} after importing the data.
 }
 \details{
 Multiple files can be loaded by calling the function with \code{\link[=lapply]{lapply()}} or

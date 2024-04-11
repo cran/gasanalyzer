@@ -1,8 +1,8 @@
 Type: Package
 Package: gasanalyzer
 Title: Import, Recompute and Analyze Data from Portable Gas Analyzers
-Version: 0.3.4
-Date: 2023-12-23
+Version: 0.4.0
+Date: 2024-04-10
 Authors@R: 
     person("Danny", "Tholen", , "thalecress+p@gmail.com", role = c("aut", "cre"),
            comment = c(ORCID = "0000-0002-9517-0939"))
@@ -26,10 +26,10 @@ Suggests: knitr, rmarkdown, spelling, graphics, ggplot2, gridExtra,
 VignetteBuilder: knitr
 Encoding: UTF-8
 Language: en-US
-RoxygenNote: 7.2.3
+RoxygenNote: 7.3.1
 NeedsCompilation: no
-Packaged: 2024-01-09 16:19:18 UTC; danny
+Packaged: 2024-04-11 19:35:48 UTC; danny
 Author: Danny Tholen [aut, cre] (<https://orcid.org/0000-0002-9517-0939>)
 Maintainer: Danny Tholen <thalecress+p@gmail.com>
 Repository: CRAN
-Date/Publication: 2024-01-10 19:13:03 UTC
+Date/Publication: 2024-04-11 22:10:06 UTC

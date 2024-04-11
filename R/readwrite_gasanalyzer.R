@@ -107,7 +107,7 @@ read_gasexchange <- function(filename, delim = "\t") {
   old_opt <- units_options("simplify")
   units_options("simplify" = NA)
   # despite BOM, seems Mac needs LE here:
-  fenc = "UTF-16LE"
+  fenc <- "UTF-16LE"
 
   headunit <- read.delim(file = filename, sep = delim, nrows = 2,
                          fileEncoding = fenc, header = FALSE,

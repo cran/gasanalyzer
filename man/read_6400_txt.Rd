@@ -2,7 +2,7 @@
 % Please edit documentation in R/read_6400.R
 \name{read_6400_txt}
 \alias{read_6400_txt}
-\title{Reads 6400XT text files and creates a tibble with gas-exchange data.}
+\title{Reads 6400XT text files and creates a tibble with gas-exchange data}
 \usage{
 read_6400_txt(filename, tz = Sys.timezone())
 }
@@ -19,8 +19,8 @@ A tibble with gas-exchange data in columns.
 \description{
 The text files stored by the 6400 contain measured and calculated values that
 are read by this function and formatted in a large tibble for use with R.
-Constants and metadata are also added as columns. Note that no recalculation of
-the gas-exchange parameters is performed, although it is possible to do that using
+Constants and metadata are also added as columns. Note that no recalculation
+of derived variables is performed, although it is possible to so using
 \code{\link[=recalculate]{recalculate()}} after importing the data.
 }
 \details{

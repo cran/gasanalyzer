@@ -77,7 +77,7 @@ nice_labels(AvsCi1)
 ## -----------------------------------------------------------------------------
 gswOld <- xlsxfile$GasEx.gsw
 xlsxfile <- xlsxfile |> 
-  transform(Const.K = 0.7) |>
+  transform(Const.K = 0.22) |>
   recalculate()
 #max effect:
 set_units(max(1 - as.numeric(xlsxfile$GasEx.gsw / gswOld)) * 100, "%")
@@ -153,7 +153,7 @@ AvsCi21 <- xlsxfile21 |> ggplot() +
                  xlsxfileRecal$GasEx.A, shape = "1% O2")) +
   scale_shape_manual(name = "Calculated at:",
                      values = c("1% O2" = 1, "21% O2" = 2)) +
-  theme(legend.position = c(0.75, 0.25))
+  theme(legend.position = "inside", legend.position.inside = c(0.75, 0.25))
 
 AvsPhiQin21 <-
   xlsxfile21 |>
@@ -168,7 +168,6 @@ AvsPhiQin21 <-
     })()
 
 grid.arrange(nice_labels(AvsCi21), nice_labels(AvsPhiQin21), ncol = 2)
-
 
 ## -----------------------------------------------------------------------------
 xlsxfileRecal |> 
@@ -205,10 +204,9 @@ SAlabs <- c("italic(K)", "italic(g)[cw]", "'['*H[2]*O*']'[r]",
             "'['*CO[2]*']'[r]", "italic(T)[leaf]")
 # set defaults to 1 (100%) and define sequences over which to permutate
 ACi[SAset] <- 1
-# +/-5%, 10% and 100% range:
-seq5 <- seq(0.95, 1.05, length.out = 21)
-seq10 <- seq(0.90, 1.10, length.out = 21)
-seq100 <- seq(0, 2, length.out = 21)
+# a 5% range:
+seq5 <- seq(-0.05, 0.05, length.out = 11)
+seq5 <- seq5[seq5 != 0]
 
 # make equations allowing to vary the variables by a relative value:
 MSFeqs <- create_equations(c("default", "gfs3000", "cuticular_conductance"), 
@@ -217,20 +215,19 @@ MSFeqs <- create_equations(c("default", "gfs3000", "cuticular_conductance"),
                            Const.gcw = function() { Const.calg * Const.gcw },
                            Const.gcc = function() { Const.gcw / 20 },
                            Meas.CO2r = function() { Const.calc * Meas.CO2r },
-                           Meas.CO2s = function() { Meas.CO2r + Meas2.dCO2 },
+                           Meas.CO2s = function() { Const.calc * Meas.CO2s },
                            Meas.H2Or = function() { Const.calh * Meas.H2Or },
-                           Meas.H2Os = function() { Meas.H2Or + Meas2.dH2O })
+                           Meas.H2Os = function() { Const.calh * Meas.H2Os })
 
 # set gcw and use steady-state equations, then use the sequences
 ACi[["Const.gcw"]] <- set_units(30, "mmol*m^-2*s^-1")
 ACi[["Const.UseDynamic"]] <- FALSE
 
-ACi.SA <- rbind(permutate(ACi, Const.calk = seq100),
-              # need to displace slightly or the default will get duplicated:
-              permutate(ACi, Const.calg = seq100 + 0.001),
-              permutate(ACi, Const.calt = seq5 + 0.002),
-              permutate(ACi, Const.calc = seq10 + 0.003),
-              permutate(ACi, Const.calh = seq10 + 0.004)) |>
+ACi.SA <- rbind(permutate(ACi, Const.calk = c(1, 1 + 20 * seq5)),
+              permutate(ACi, Const.calg = 1 + 20 * seq5),
+              permutate(ACi, Const.calt = 1 + seq5),
+              permutate(ACi, Const.calc = 1 + seq5),
+              permutate(ACi, Const.calh = 1 + seq5)) |>
   recalculate(MSFeqs)
 
 ## ----fitaci, eval = NOT_CRAN, purl = NOT_CRAN---------------------------------
@@ -278,34 +275,36 @@ CO2curves.SA <- ACi.SA |>
 
 # reference values are where the SAset variables equal 1:
 refids <- rowSums(CO2curves.SA[SAset] == 1) == length(SAset)
-refVal <- CO2curves.SA[refids, aPars] |> colMeans()
-
 # combine all relative values in one column based on group:
-CO2curves.SA$gval <- unlist(CO2curves.SA[cbind(1:nrow(CO2curves.SA),
+CO2curves.SA$gval <- unlist(CO2curves.SA[cbind(seq_len(nrow(CO2curves.SA)),
                                         match(CO2curves.SA$group,
                                               names(CO2curves.SA)))])
+# value as relative change:
+CO2curves.SA$gval <- 100 * (as.numeric(CO2curves.SA$gval) - 1)
+
 # calc mean over the 3 reps:
 CO2curves.SAm <- 
   sapply(names(CO2curves.SA[aPars]),
          \(x) {
+           # relative change:
+           rval <- 100 * as.numeric((CO2curves.SA[[x]] - 
+                                       CO2curves.SA[[x]][refids]) /
+                                      abs(CO2curves.SA[[x]][refids]))
+           # grouping:
            byl <- as.list(CO2curves.SA[SAset])
            with(CO2curves.SA, 
                 data.frame(nm = x, 
                            aggregate(cbind(gval), byl, head, n = 1),
                            group = aggregate(group, byl, head, n = 1)[["x"]],
-                           val = aggregate(get(x) / refVal[x],
-                                           byl, mean)[["x"]],
-                           se = aggregate(get(x) / refVal[x],
-                                          byl, FUN = \(x) sd(x) /
-                                            sqrt(length(x)))[["x"]]))},
+                           val = aggregate(rval, byl, mean)[["x"]],
+                           sd = aggregate(rval, byl, sd)[["x"]]))},
          simplify = FALSE) |>
   do.call(rbind, args = _)
-
 
 ## ----fig.height = 2.5, fig.width = 7, warning = FALSE, eval = NOT_CRAN, purl = NOT_CRAN----
 grid.arrange(grobs = CO2curves.SA$Plots[refids], ncol = 3)
 
-## ----eval=NOT_CRAN, fig.height=7, fig.width=7, purl=NOT_CRAN------------------
+## ----eval=NOT_CRAN, fig.height=5, fig.width=7, purl=NOT_CRAN------------------
 # make lbls factors for good order and plotmath
 CO2curves.SAm$group <- factor(CO2curves.SAm$group,
                               levels = SAset,
@@ -316,19 +315,17 @@ CO2curves.SAm$nm <- factor(CO2curves.SAm$nm,
                                       "italic(V)[TPU]", "italic(R)[L]"))
 # and plot:
 CO2curves.SAm |>
-  ggplot(aes(x = gval, y = val,group=nm)) + 
-  geom_vline(aes(xintercept = 1), linetype = "dotdash", color = "darkgrey") +
+  ggplot(aes(x = gval, y = val, group = nm)) + 
+  geom_vline(aes(xintercept = 0), linetype = "dotdash", color = "darkgrey") +
   geom_point() +
-  geom_ribbon(aes(ymin = val - se, ymax = val + se), alpha = 0.1) +
+  geom_ribbon(aes(ymin = val - sd, ymax = val + sd), alpha = 0.1) +
   facet_grid(cols = vars(group), rows = vars(nm),
              scales="free", labeller = label_parsed) +
   xlab("Relative change in variable (%)") + 
   ylab("Relative change in parameter (%)") +
-  scale_x_continuous(expand = expansion(mult = 0.09), 
-                     labels = function(x) round((x - 1) * 100, 1)) +
-  scale_y_continuous(labels = function(x) round((x - 1) * 100, 1)) +
   theme(plot.title = element_text(size = 14),
-        panel.grid.minor = element_blank())
+        panel.grid.minor = element_blank(),
+        panel.spacing.x = unit(14, "pt"))
 
 
 
@@ -373,7 +370,8 @@ d13Cslopes <- isotopes |>
     guides(fill = "none", 
          colour = guide_legend(override.aes = list(fill = NA))) +
   labs(color = var2label("d13CConst.f", TRUE)[[1]]) +
-  theme(legend.position = c(0.75, 0.10), legend.direction = "horizontal")
+  theme(legend.position = "inside", legend.position.inside = c(0.75, 0.10),
+        legend.direction = "horizontal")
 
 nice_labels(d13Cslopes)
 
@@ -431,7 +429,8 @@ fsens <- ggplot(gmEst, aes(d13CConst.f, d13C.gm,
   geom_point(color = "black") +
   geom_ribbon(alpha = 0.1, color = NA) + guides(color = "none") +
   scale_shape_manual("Method:", values = c(1, 2)) + facet_wrap(vars(Model)) +
-  theme(legend.position = c(0.12, 0.85), panel.grid.minor = element_blank()) 
+  theme(legend.position = "inside", legend.position.inside = c(0.12, 0.85),
+        panel.grid.minor = element_blank()) 
 nice_labels(fsens)
 
 ## ----include=FALSE, eval = NOT_CRAN, purl = NOT_CRAN--------------------------

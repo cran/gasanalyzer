@@ -103,9 +103,9 @@ parse_6800_xlsx <- function(filename, extract_formula = FALSE,
   class(allCells) <- "data.frame"
 
   if (any(allCells$sheet=="Measurements"))
-    msheet = "Measurements"
+    msheet <- "Measurements"
   else
-    msheet = allCells$sheet[1]
+    msheet <- allCells$sheet[1]
 
   # load head calibration from remarks
   remarksDF <- allCells[allCells$sheet == "Remarks" & allCells$col < 3L, ]
@@ -161,7 +161,7 @@ parse_6800_xlsx <- function(filename, extract_formula = FALSE,
   # split the df by grp, add col with the header name for the header row
   # and remove the original line with the header name
   constsDA <- lapply(vec_split(constsDA, constsDA$n)[[2]], function(x)
-  { x$group = replace(NA, x$row == x$row[1L],
+  { x$group <- replace(NA, x$row == x$row[1L],
                       x$character[1L]); x[-1L, ]}) |>
     do.call(vec_rbind, args = _)
 
@@ -175,13 +175,13 @@ parse_6800_xlsx <- function(filename, extract_formula = FALSE,
 
   # assumption: header is 1 row, data starts after that
   # and *is also only one row* (keep row integer!)
-  constsDF$row = constsDF$row + 1L
+  constsDF$row <- constsDF$row + 1L
   # join back headers to constsDA
   constsDF <- constsDF[c("header", "row", "col", "group")]  |>
     merge(constsDA[, !names(constsDA) %in% c("group", "n"), drop = FALSE],
           all.x = T, sort = F, by = c("row", "col"))
   # we are not interested in row differences before datastart
-  constsDF$row = replace(constsDF$row,
+  constsDF$row <- replace(constsDF$row,
                          constsDF$row <= headerrows[length(headerrows)],
                          headerrows[length(headerrows)] + 1L)
 
@@ -234,7 +234,7 @@ parse_6800_xlsx <- function(filename, extract_formula = FALSE,
                                             Row1$header)))
 
     # now replace refs with derefs and xl_to_r functions
-    formDF$fn = stri_replace_all_regex(formDF$formula,
+    formDF$fn <- stri_replace_all_regex(formDF$formula,
                                        c(paste0("\\b",
                                                 unlist(formDF$refs),
                                                 "\\b"),
@@ -290,8 +290,8 @@ parse_6800_xlsx <- function(filename, extract_formula = FALSE,
 #' for speed, and instead applied to the merged data using [recalculate()].
 #'
 #' @param filename an xlsx file containing 6800 gas-exchange data.
-#' @param recalculate character string indicating whether or not to recalculate data
-#'   using equations from the xlsx file.
+#' @param recalculate character string indicating whether or not to recalculate
+#'   data using equations from the xlsx file.
 #'
 #' @returns A tibble with gas-exchange data in columns.
 #'
@@ -452,7 +452,7 @@ read_6800_xlsx <- function(filename, recalculate = TRUE) {
                          mode = "standard"),
                error = function(e) {
                  warning("Failed to apply unit specified in data file: ",
-                         tmpu, ", to col ", nm, "\n");
+                         tmpu, ", to col ", nm, "\n")
                  out[[nm]]
                })
   }
@@ -465,13 +465,14 @@ read_6800_xlsx <- function(filename, recalculate = TRUE) {
   # only now drop rows that were related to Consts but had no obs (col 1)
   out <- out[!is.na(out[[1L]]), ]
 
-out <- within(out, {
   #Apertures get special treatment to remove unnecessary units:
-  ChambConst.Aperture <- gsub("^([0-9.]*)(.*)$", "\\1",
-                              get0("ChambConst.Aperture", ifnotfound = NA))
-  #firmware bug: wrong units cf_a (fixed >=2.1.11)
-  MchStatus.CFaCO2 <- as.numeric(get0("MchStatus.CFaCO2", ifnotfound = NA))
-})
+  out["ChambConst.Aperture"] <- gsub("^([0-9.]*)(.*)$", "\\1",
+                                  g0("ChambConst.Aperture", NA,
+                                     envir = list2env(out)))
+  # firmware bug: wrong units cf_a (fixed >=2.1.11)
+  # FIXME: header says mmol should be umol, fix this better
+  out["MchStatus.CFaCO2"] <- as.numeric(g0("MchStatus.CFaCO2", NA,
+                                           envir = list2env(out)))
 
   if (recalculate) {
     eqs <- extract_6800_equations(DFs[["formula"]])
@@ -493,9 +494,8 @@ out <- within(out, {
 #' The text files stored by the 6800 contain measured and calculated values that
 #' are read by this function and formatted in a large tibble for use with R.
 #' Constants and metadata (such as calibration information) are also added as
-#' columns. Note that no recalculation of the gas-exchange parameters is
-#' performed, although it is possible to do that using [recalculate()] after
-#' importing the data.
+#' columns. Note that no recalculation of derived variables is performed,
+#' although it is possible to so using [recalculate()] after importing the data.
 #'
 #' Multiple files can be loaded by calling the function with [lapply()] or
 #' [purrr::map()] to merge multiple files. In this case, it is important
@@ -634,9 +634,10 @@ read_6800_txt <- function(filename) {
         lastcol <- length(nohead)
         #for rows where the last col is not empty
         #bring the spurious value to the end (i.e. rotate those vectors)
-        badrows <- datamat[,lastcol] != ""
+        badrows <- datamat[ ,lastcol] != ""
         datamat[badrows, (cuscol):lastcol] <- datamat[badrows,
-                                                      c((cuscol+1):lastcol, cuscol), drop = F]
+                                                      c((cuscol+1):lastcol,
+                                                        cuscol), drop = F]
         #but only replace from Const.Geometry onwards
 
         #rest of the col gets NA
@@ -668,19 +669,19 @@ read_6800_txt <- function(filename) {
   names(unitsvec) <- header
 
   #empty (but don't cut yet) headers:
-  datamat[1:3, ] = ""
+  datamat[1:3, ] <- ""
 
-  conheader = c(remarks[consts_in, 1], cdata[consts_dt, 1]) |>
+  conheader <- c(remarks[consts_in, 1], cdata[consts_dt, 1]) |>
     rename_header("Li6800")
-  convals = c(remarks[consts_in, 2], cdata[consts_dt, 2])
+  convals <- c(remarks[consts_in, 2], cdata[consts_dt, 2])
   # put initial constants on row 1 (the header has been emptied already)
   # The data-interspaced consts go to the rows on which they are found.
   # (not on datarows, and only on those identified by consts_dt)
-  conrow = c(rep(1, sum(consts_in)),
-             (1:nrow(datamat))[!datarows][consts_dt])
+  conrow <- c(rep(1, sum(consts_in)),
+             (seq_len(nrow(datamat)))[!datarows][consts_dt])
   # Reshape and combine with data in one go
 
-  urow <- 1L:nrow(datamat)
+  urow <- seq_len(nrow(datamat))
   headerall <-  c(header, conheader)
   uheaderall <- unique(headerall)
   uconheader <- unique(conheader)
@@ -711,19 +712,23 @@ read_6800_txt <- function(filename) {
   condat <- condat[datarows,]
   condat <- units_convert(condat, unitsvec)
 
-  condat <- within(condat, {
-    SysObs.Filename <- file_path_sans_ext(basename(filename))
-    SysConst.UserCal <- list(headcal)
-    #FIXME: if cal date (firmware 2.1.11), then use that!
-    SysConst.FactCal <- list(get_factory_cals(serialnumber, filedate)[ , 1])
-    SysObs.Instrument <- "Li6800"
-    gasanalyzer.Equations <- list(NA)
-    #Apertures get special treatment to remove unnecessary units:
-    ChambConst.Aperture <- gsub("^([0-9.]*)(.*)$", "\\1",
-                                get0("ChambConst.Aperture", ifnotfound = NA))
-    #firmware bug: wrong units cf_a (fixed >=2.1.11)
-    MchStatus.CFaCO2 <- as.numeric(get0("MchStatus.CFaCO2", ifnotfound = NA))
-  })
+  condat["SysObs.Filename"] <- file_path_sans_ext(basename(filename))
+  #note [[]] here
+  condat[["SysConst.UserCal"]] <- list(headcal)
+  #FIXME: if cal date (firmware 2.1.11), then use that!
+  condat[["SysConst.FactCal"]] <- list(get_factory_cals(serialnumber,
+                                                      filedate)[ , 1])
+  condat[["gasanalyzer.Equations"]] <- list(NA)
+
+  condat["SysObs.Instrument"] <- "Li6800"
+  #Apertures get special treatment to remove unnecessary units:
+  condat["ChambConst.Aperture"] <- gsub("^([0-9.]*)(.*)$", "\\1",
+                                        g0("ChambConst.Aperture", NA_real_,
+                                           envir = list2env(condat)))
+  #firmware bug: wrong units cf_a (fixed >=2.1.11)
+  #FIXME: may need a better fix, see above
+  condat["MchStatus.CFaCO2"] <- as.numeric(g0("MchStatus.CFaCO2", NA_real_,
+                                              envir = list2env(condat)))
 
   condat <- fixup_import(condat) |>
     # add O2 uncorrected vals, this is a bit time consuming

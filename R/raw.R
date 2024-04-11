@@ -192,7 +192,7 @@ frac2abs <- function(hc, gas = c("co2", "h2o"), ch = c("a", "b"), fr) {
     apply(cbind(-fr@"umol/mol/K"@., matrix(as.numeric(hc[, fc]),
                                            nrow=length(fr))), 1,
           function(a) { if(any(is.na(a))) NA else {
-            y <- polyroot(a);
+            y <- polyroot(a)
             min(Re(y)[abs(Im(y)) < 1e-12])
           }
           })@"kPa^-1"
@@ -200,7 +200,7 @@ frac2abs <- function(hc, gas = c("co2", "h2o"), ch = c("a", "b"), fr) {
     apply(cbind(-fr@"mmol/mol/K"@., matrix(as.numeric(hc[, fc[1:3]]),
                                            nrow=length(fr))), 1,
           function(a) { if(any(is.na(a))) NA else {
-            y <- polyroot(a);
+            y <- polyroot(a)
             min(Re(y)[abs(Im(y)) < 1e-12])
           }
           })@"kPa^-1"

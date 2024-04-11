@@ -9,8 +9,8 @@ read_6800_xlsx(filename, recalculate = TRUE)
 \arguments{
 \item{filename}{an xlsx file containing 6800 gas-exchange data.}
 
-\item{recalculate}{character string indicating whether or not to recalculate data
-using equations from the xlsx file.}
+\item{recalculate}{character string indicating whether or not to recalculate
+data using equations from the xlsx file.}
 }
 \value{
 A tibble with gas-exchange data in columns.

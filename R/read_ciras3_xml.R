@@ -16,8 +16,7 @@
 #'   omitted, the current time zone is used. Invalid values are typically
 #'   treated as UTC, on some platforms with a warning.
 #'
-#' @return a tibble with gas-exchange data in columns and equations as
-#'   attribute.
+#' @return a tibble with gas-exchange data in columns.
 #'
 #' @importFrom xml2 read_xml xml_children xml_attrs xml_name
 #' @importFrom stringi stri_list2matrix

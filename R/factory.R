@@ -165,7 +165,7 @@ get_factory_cals <- function(sn = NULL, datetime = NULL) {
     # This should nevertheless be save as unlist is called first....
     if (!is.null(datetime)) {
       # every entry in datetime must have a matching entry in the list
-      mapply(function(x,y) { tdiff <- as.numeric(y) - as.numeric(names(x));
+      mapply(function(x,y) { tdiff <- as.numeric(y) - as.numeric(names(x))
                              # if we fail to find a date before the measurement
                              # simply return the earliest (length(x) calibration
                              unlist(x[c(which.min(tdiff[tdiff>0]),

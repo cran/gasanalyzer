@@ -34,7 +34,7 @@
 #     ifelse(drop_units(ms.fh) == -1,
 #             "point",
 #             ifelse(b | c | d,
-#                     ifelse(near(a, a_est, tol = 0.006), # tol bc li rounds vals
+#                     ifelse(near(a, a_est, tol = 0.006), # tol because rounding
 #                             ifelse(pmax(me.at - ms.fl, ms.fh - me.at) > dlt,
 #                                     "full.point_adj",
 #                                     "partial.point_adj"),
@@ -96,7 +96,7 @@
 #                      "MchStatus.MatchCO2", "MchStatus.MatchH2O")
 #
 #     if (!all(needed_cols %in% colnames(df)))
-#         stop("Extracting matches requires MchEvent.* and MchStatus.* columns.")
+#         stop("Extracting matches needs MchEvent.* and MchStatus.* columns.")
 #
 #     # SysObs.time and Tirga are facultative but allow distinct output to have
 #     # a timestamp and temperature for the first measurement they were used for
@@ -105,7 +105,8 @@
 #             select(., any_of(useful_cols),
 #                    all_of(needed_cols)) %>%
 #             #distinct _match and _cf:
-#             distinct(., across(all_of(needed_cols[c(1,2, 9:16)])), .keep_all = T)
+#             distinct(., across(all_of(needed_cols[c(1,2, 9:16)])),
+#                      .keep_all = T)
 #         else if (distinct == "range")
 #             arrange(., across(any_of("SysObs.time"))) %>%
 #             select(., any_of(useful_cols),
@@ -166,8 +167,8 @@
 #         stop("Input dataframe requires MchEvent.* and MchStatus.* columns.")
 #
 #     if(nrow(src) != nrow(dst) & nrow(dst) != 1)
-#         stop(paste("If dst has more than one row, src and dst need to have the",
-#                    "same number of rows."))
+#         stop(paste("If dst has more than one row, src and dst need to have ",
+#                    "the same number of rows."))
 #
 #     cf_co2 <- stri_subset_regex(c(colnames(dst)),
 #                                 "^MchStatus.cf_co2_[bcd]$")
@@ -187,8 +188,8 @@
 #                             colnames(dst))) |
 #             (h2o.ops & !all(c("MchStatus.cf_h2o_a", "MchType.h2o") %in%
 #                             colnames(dst))))
-#             stop(paste("If point adjustment is not used, dst for CO2 or H2O must
-#                    contain all 4 coefficients and a MchType column."))
+#             stop(paste("If point adjustment is not used, dst for CO2 or ",
+#                  "H2O must contain all 4 coefficients and a MchType column."))
 #         if (co2.ops) cf_co2 <- c(cf_co2, "MchStatus.cf_co2_a")
 #         if (h2o.ops) cf_h2o <- c(cf_h2o, "MchStatus.cf_h2o_a")
 #     }
