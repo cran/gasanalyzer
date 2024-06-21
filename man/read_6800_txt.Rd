@@ -30,8 +30,8 @@ exampledir <- system.file("extdata", package = "gasanalyzer")
 import_factory_cals(exampledir)
 
 # read data
-li6800 <- read_6800_xlsx(paste0(exampledir, "//lowo2.xlsx"))
-li6800_txt <- read_6800_txt(paste0(exampledir, "//lowo2"))
+li6800 <- read_6800_xlsx(file.path(exampledir, "lowo2.xlsx"))
+li6800_txt <- read_6800_txt(file.path(exampledir, "/lowo2"))
 
 # compare all except equations. Note txt file reports some NAs as zero:
 columns_to_check <- names(li6800)[!names(li6800) \%in\%

@@ -23,7 +23,7 @@
 #' @export
 #'
 #' @examples
-#' example <- system.file("extdata//lowo2.xlsx", package = "gasanalyzer")
+#' example <- system.file("extdata", "lowo2.xlsx", package = "gasanalyzer")
 #'
 #' # get equations stored in the xlsx file
 #' Eqs <- read_6800_equations(example)
@@ -206,15 +206,14 @@ parse_6800_xlsx <- function(filename, extract_formula = FALSE,
   dataDF$header <- headerDF$header[idx]
   dataDF$group <- headerDF[[2L]][idx]
 
-  # convenient is the first row, but lets take one with formulas
-  dataRow1 <- dataDF[dataDF$row == dataDF$row[!is.na(dataDF$formula)][1], ]
-
   # extract the formulas. I'm going to assume formulas don't change with
   # rows, except when new constants are listed between rows, but since we
   # made nice columns out of those, all formulas in a col should be
   # identical and so we use only the first row of data & consts
   # to construct R formulas
   if (extract_formula == TRUE) {
+    # convenient is the first row with formulas
+    dataRow1 <- dataDF[dataDF$row == dataDF$row[!is.na(dataDF$formula)][1], ]
 
     constsRow1 <- constsDF[constsDF$row == constsDF$row[1L], ]
     # for name - address lookups:
@@ -249,19 +248,22 @@ parse_6800_xlsx <- function(filename, extract_formula = FALSE,
     formDF <- NA
 
   if (extract_units == TRUE) {
+    # the row the header name
+    dataRow1 <- dataDF[headerrows[2L], ]
     # always keep this off:
     old_opt <- units_options("simplify")
     units_options("simplify" = NA)
 
     unitsDF <- allCells[allCells$row == headerrows[3L],
                         c("col", "character")]
-    # replace silly things
     unitsDF$character <- stri_replace_all_fixed(unitsDF$character,
                                                 c("\u207b", "\u00b2",
                                                   "\u00b9", "\u00b3", "hrs"),
                                                 c("-", "2", "1", "3", "h"),
                                                 vectorize_all = FALSE)
     names(unitsDF)[names(unitsDF) == "character"] <- "units"
+    # it is possible that a row has units, but no data at all
+    # in that case, we can either ignore the empty cells
     unitsDF$header <- dataRow1$header[dataRow1$col %in% unitsDF$col]
     units_options("simplify" = old_opt)
   } else
@@ -314,11 +316,11 @@ parse_6800_xlsx <- function(filename, extract_formula = FALSE,
 #' import_factory_cals(exampledir)
 #'
 #' # read data:
-#' li6800 <- read_6800_xlsx(paste0(exampledir, "//lowo2.xlsx"))
-#' li6800_norecalc <- read_6800_xlsx(paste0(exampledir, "//lowo2.xlsx"),
+#' li6800 <- read_6800_xlsx(file.path(exampledir, "lowo2.xlsx"))
+#' li6800_norecalc <- read_6800_xlsx(file.path(exampledir, "lowo2.xlsx"),
 #'   recalculate = FALSE)
 #' li6800_norecalc$gasanalyzer.Equations <-
-#'   list(read_6800_equations(paste0(exampledir, "//lowo2.xlsx")))
+#'   list(read_6800_equations(file.path(exampledir, "lowo2.xlsx")))
 #'
 #' all.equal(li6800, recalculate(li6800_norecalc), check.attributes = FALSE)
 #'
@@ -371,7 +373,7 @@ read_6800_xlsx <- function(filename, recalculate = TRUE) {
   # for QA a comparison with a spreadsheet calc could be made
   formulaVector <- !is.na(dtDF$formula)
   # assume relevant formula content is numeric...
-  # This slightly breaks for Const.UseDynamic
+  # This slightly breaks for SysConst.UseDynamic
   dtDF$numeric[formulaVector] <- as.numeric(dtDF$content[formulaVector])
 
   #add metadata here:
@@ -396,7 +398,7 @@ read_6800_xlsx <- function(filename, recalculate = TRUE) {
   # one could debate whether this means 0 or NA, i'll go
   # with NA for now
   measDF$character <- replace(measDF$character,
-                              measDF$character %in% c("none", "-"),
+                              measDF$character %in% c("None", "none", "-"),
                               NA)
 
   exclude_meta <- seq(1, nrow(measDF) - nrow(metaDF))
@@ -522,8 +524,8 @@ read_6800_xlsx <- function(filename, recalculate = TRUE) {
 #' import_factory_cals(exampledir)
 #'
 #' # read data
-#' li6800 <- read_6800_xlsx(paste0(exampledir, "//lowo2.xlsx"))
-#' li6800_txt <- read_6800_txt(paste0(exampledir, "//lowo2"))
+#' li6800 <- read_6800_xlsx(file.path(exampledir, "lowo2.xlsx"))
+#' li6800_txt <- read_6800_txt(file.path(exampledir, "/lowo2"))
 #'
 #' # compare all except equations. Note txt file reports some NAs as zero:
 #' columns_to_check <- names(li6800)[!names(li6800) %in%
@@ -538,14 +540,17 @@ read_6800_txt <- function(filename) {
   # typical files. Note that some files seem nul-truncated
   rawfile <- readLines(filename, skipNul = TRUE)
 
-  # find sections. search only first 1000 lines for header, and
-  # assume header < 1000 lines
+  # find sections.
   rfl <- length(rawfile)
-  header_start <- which(rawfile[1:min(rfl, 1000)] == "[Header]")
+
+  header_start <- which(rawfile == "[Header]")
   if (length(header_start) == 0L) {
-    warning("No [Header] section in first 1000 lines, ignoring",
-            filename, ".\n")
+    warning("No [Header] section found in ", filename, ".\n")
     return(tibble())
+  } else if(length(header_start) > 1L) {
+    warning("Multiple [Header] sections found in ", filename, ". Appended ",
+            "files are not yet supported.\n")
+    header_start <- header_start[1]
   }
 
   data_start <- which(rawfile[header_start:min(rfl, header_start +
@@ -626,8 +631,8 @@ read_6800_txt <- function(filename) {
   # FIXME: do more testing for this bug, it may be even worse...
   if (nohead[length(nohead)]) {
     if (all(header != "Consts.Custom")) {
-
-      #find the custom col:
+      #find the custom col
+      #note headers not renamed, li6800 uses Const instead of SysConst for Geom
       cuscol <- which(header == "Const.Geometry")
       if (length(cuscol) > 0) {
         cuscol <- cuscol + 1
@@ -639,7 +644,6 @@ read_6800_txt <- function(filename) {
                                                       c((cuscol+1):lastcol,
                                                         cuscol), drop = F]
         #but only replace from Const.Geometry onwards
-
         #rest of the col gets NA
         datamat[!badrows, lastcol] <- NA
         datamat[3, lastcol] <- "mol*m^-2*s^-1"
@@ -651,7 +655,7 @@ read_6800_txt <- function(filename) {
   }
   datamat <- datamat[, !nohead]
   # these seem to mean usually NA, I hope it isn't too blunt:
-  datamat <- replace(datamat, datamat %in% c("none", "-"), NA)
+  datamat <- replace(datamat, datamat %in% c("None", "none", "-"), NA)
   header <- header[!nohead] |>
     rename_header("Li6800") |> make.unique()
   # and apply:
@@ -734,6 +738,8 @@ read_6800_txt <- function(filename) {
     # add O2 uncorrected vals, this is a bit time consuming
     calculate_raw()
 
+  # FLR parameters are completely incorrect if no data available because 0!=NA
+  # I'm not even sure i want to go through the trouble of fixing this
   units_options("simplify" = old_opt)
   condat[sort_names(names(condat))]
 }

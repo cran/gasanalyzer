@@ -32,7 +32,7 @@ exampledir <- system.file("extdata", package = "gasanalyzer")
 import_factory_cals(exampledir)
 
 # read data from a txt file:
-li6800 <- read_6800_txt(paste0(exampledir, "//lowo2"))
+li6800 <- read_6800_txt(file.path(exampledir, "lowo2"))
 
 # create a default set of gas-exchange equations, for the Li-6800:
 Eqs <- create_equations(c("default", "li6800"))

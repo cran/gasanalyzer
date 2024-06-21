@@ -29,7 +29,7 @@ Multiple files can be loaded by calling the function with \code{\link[=lapply]{l
 to ensure that the column names will match.
 }
 \examples{
-example <- system.file("extdata//6400-testfile", package = "gasanalyzer")
+example <- system.file("extdata", "6400-testfile", package = "gasanalyzer")
 
 # read data
 li6400data <- read_6400_txt(example)

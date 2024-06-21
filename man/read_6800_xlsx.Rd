@@ -39,11 +39,11 @@ exampledir <- system.file("extdata", package = "gasanalyzer")
 import_factory_cals(exampledir)
 
 # read data:
-li6800 <- read_6800_xlsx(paste0(exampledir, "//lowo2.xlsx"))
-li6800_norecalc <- read_6800_xlsx(paste0(exampledir, "//lowo2.xlsx"),
+li6800 <- read_6800_xlsx(file.path(exampledir, "lowo2.xlsx"))
+li6800_norecalc <- read_6800_xlsx(file.path(exampledir, "lowo2.xlsx"),
   recalculate = FALSE)
 li6800_norecalc$gasanalyzer.Equations <-
-  list(read_6800_equations(paste0(exampledir, "//lowo2.xlsx")))
+  list(read_6800_equations(file.path(exampledir, "lowo2.xlsx")))
 
 all.equal(li6800, recalculate(li6800_norecalc), check.attributes = FALSE)
 

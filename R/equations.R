@@ -31,7 +31,7 @@
 #' import_factory_cals(exampledir)
 #'
 #' # read data from a txt file:
-#' li6800 <- read_6800_txt(paste0(exampledir, "//lowo2"))
+#' li6800 <- read_6800_txt(file.path(exampledir, "lowo2"))
 #'
 #' # passing an invalid flags shows which flags are valid:
 #' \donttest{create_equations("help")}
@@ -76,11 +76,10 @@ create_equations <- function(useflags = "default", ...) {
 
   notaflagIdx <- !(useflags %in% validflags)
   if (any(notaflagIdx)) {
-    wtext <- paste0("Valid flags are ",
-                    paste0(validflags[!(validflags %in% c(""))],
-                           collapse = ", ")) |>
-      stri_wrap() |> paste(collapse = "\n")
-    warning(wtext, "\n")
+    wtext <- paste0(validflags[!(validflags %in% c(""))],
+                           collapse = ", ") |>
+      stri_wrap(initial = "Valid flags are: ") |> paste(collapse = "\n")
+    warning("\n", wtext, "\n")
     useflags <- useflags[!notaflagIdx]
   }
 
@@ -184,7 +183,7 @@ create_equations <- function(useflags = "default", ...) {
 #' import_factory_cals(exampledir)
 #'
 #' # read data from a txt file:
-#' li6800 <- read_6800_txt(paste0(exampledir, "//lowo2"))
+#' li6800 <- read_6800_txt(file.path(exampledir, "lowo2"))
 #'
 #' # create a default set of gas-exchange equations, for the Li-6800:
 #' Eqs <- create_equations(c("default", "li6800"))
@@ -257,7 +256,7 @@ modify_equations <- function(eqs, ...) {
 #' import_factory_cals(exampledir)
 #'
 #' # read data:
-#' li6800 <- read_6800_xlsx(paste0(exampledir, "//lowo2.xlsx"))
+#' li6800 <- read_6800_xlsx(file.path(exampledir, "lowo2.xlsx"))
 #'
 #' # recalculate using xlsx equations:
 #' li6800 <- recalculate(li6800)
@@ -275,8 +274,7 @@ recalculate <- function(df, eqs = NULL) {
     return(df)
   }
 
-  if (length(eqs) == 0 || !inherits(eqs, "list") ||
-      length(eqs[["gasanalyzer.UseFlags"]]) == 0) {
+  if (length(eqs) == 0 || !inherits(eqs, "list") ) {
     if (length(df[["gasanalyzer.Equations"]]) == 0) {
       warning("No valid equations provided or found in df. Returning as-is.\n")
       return(df)

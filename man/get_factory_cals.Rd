@@ -29,7 +29,7 @@ The datetime option can be used to make sure that newer calibration
 files are not used in combination with older datafiles.
 }
 \examples{
-exampledir <- system.file("extdata//", package = "gasanalyzer")
+exampledir <- system.file("extdata", package = "gasanalyzer")
 
 # import factory cals for example data:
 import_factory_cals(exampledir)

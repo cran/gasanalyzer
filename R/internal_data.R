@@ -9,15 +9,13 @@
 load_internal_data <- function() {
 
   vars <- asNamespace("gasanalyzer")$vars
-  #TODO: could consider moving the eqs assignment also
-  #to raw-data...
+  #TODO: could consider moving the eqs assignment also to raw-data...
   eqs <- calcs()
   for (x in names(eqs)) {
     vars$fn[vars$fullname == x] <- list(eqs[x])
   }
   #no need to keep it around:
-  rm("vars",envir = asNamespace("gasanalyzer"))
-
+  rm("vars", envir = asNamespace("gasanalyzer"))
 
   # all these are fancy looking, but terrible to actually work with
   sympairs <- c(

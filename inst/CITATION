@@ -1,0 +1,12 @@
+## R package reference generated from DESCRIPTION metadata
+citation(auto = meta)
+
+## article
+bibentry(bibtype = "article",
+         title = "{GasanalyzeR}: Advancing Reproducible Research using a New R Package for Photosynthesis Data Workflows",
+         doi = "10.1093/aobpla/plae035",
+         journal = "AoB PLANTS",
+         author = "Danny Tholen",
+         volume = 16,
+         pages = "plae035",
+         year = "2024")

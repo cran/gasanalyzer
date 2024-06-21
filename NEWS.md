@@ -1,3 +1,13 @@
+# gasanalyzer 0.4.1
+* Minor update
+  - setup test infrastructure (not many useful unit tests added yet)
+  - bug fixes to gas-exchange equations (especially related to cuticular conductance)
+  - Add option to modulate the relative humidity in the leaf
+  - reorder some variables in more logical categories 
+  - Fix loading of some LI6800 files
+  - Make file loading in examples more platform independent
+  - Updated description and refer to the publication about the package
+  
 # gasanalyzer 0.4.0
 
 * Minor update

@@ -30,7 +30,7 @@ firmware allows defining custom equations, it is not guaranteed that all
 equations can be extracted successfully.
 }
 \examples{
-example <- system.file("extdata//lowo2.xlsx", package = "gasanalyzer")
+example <- system.file("extdata", "lowo2.xlsx", package = "gasanalyzer")
 
 # get equations stored in the xlsx file
 Eqs <- read_6800_equations(example)

@@ -21,7 +21,7 @@ UTF-16LE (use the export as unicode txt option in Microsoft Excel).
 }
 \examples{
 
-example <- system.file("extdata//d13C.tsv", package = "gasanalyzer")
+example <- system.file("extdata", "d13C.tsv", package = "gasanalyzer")
 
 # read data
 read_gasexchange(example)

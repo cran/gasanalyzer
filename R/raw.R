@@ -221,7 +221,7 @@ frac2abs <- function(hc, gas = c("co2", "h2o"), ch = c("a", "b"), fr) {
 #'
 #' Valid factory and head calibration information is needed.
 #'
-#' @param tb a gas-exchange tibble with SysConst.Oxygen, Meas.H2Oa, Meas.CO2a,
+#' @param tb a gas-exchange tibble with Const.Oxygen, Meas.H2Oa, Meas.CO2a,
 #'   Meas.H2Or, Meas.CO2r, Status.Ts and Status.Tr
 #'
 #' @returns a gas-exchange tibble with Raw.H2Oa, Raw.H2Or, Raw.CO2aAbsP,
@@ -234,17 +234,17 @@ calculate_raw <- function(tb) {
   }
   hc <- get_cal(tb$SysConst.UserCal, tb$SysConst.FactCal)
 
-  psih <- psiH2O(hc, tb$SysConst.Oxygen)
+  psih <- psiH2O(hc, tb$Const.Oxygen)
   tb$Raw.H2Oa <- (tb$Meas.H2Oa / psih)@"mmol*mol^-1"
   tb$Raw.H2Or <- (tb$Meas.H2Or / psih)@"mmol*mol^-1"
 
-  opsi_a <- psiCO2(hc, tb$SysConst.Oxygen, tb$Meas.H2Oa)
+  opsi_a <- psiCO2(hc, tb$Const.Oxygen, tb$Meas.H2Oa)
   # note units cannot correctly convert 1/degC to 1/K, so convert manually
   tb$Raw.CO2aAbsP <- frac2abs(hc, "co2", "a",
                                tb$Meas.CO2a / (tb$Status.Ts@"K" * opsi_a)) *
     opsi_a
 
-  opsi_b <- psiCO2(hc, tb$SysConst.Oxygen, tb$Meas.H2Or)
+  opsi_b <- psiCO2(hc, tb$Const.Oxygen, tb$Meas.H2Or)
   tb$Raw.CO2rAbsP <- frac2abs(hc, "co2", "b",
                                tb$Meas.CO2r / (tb$Status.Tr@"K" * opsi_b)) *
     opsi_b

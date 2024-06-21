@@ -1,295 +1,298 @@
-useflag	group	unified	plotmath	units	default	ESSDIVE	ESSDIVEunits	Li6800	Li6400	Li6400units	GFS3000	CIRAS3	CIRAS3units	CIRAS4	CIRAS4units	description
-default	SysObs	Time		posix				time						TIMESTAMP	posix	Unix time stamp (seconds since 00:00:00 UTC on 1 January 1970) of the current observation
-default	SysObs	Elapsed		s				elapsed	FTime	s						Seconds since first observation
-default	SysObs	Date		character		date		date			Date					Date in local timezone of the current observation as character string
-default	SysObs	HHMMSS		character		time		hhmmss	HHMMSS	character	Time					Time in local timezone of the current observation as character string
-default	SysObs	Averaging		s				averaging								Additional averaging on current observation
-default	SysObs	Instrument		character												The instrument type used to collect this data
-default	SysObs	Serial		character												The serial number of the instrument
-default	SysConst															System constants associated with calculations from raw values
-default	SysConst	AvgTime		s				AvgTime								Averaging time for measurements
-default	SysConst	Oxygen	"""[""*O[2]*""]"""	%	21	Oi	mmol mol-1	Oxygen	Oxygen%	%	Oxygen					Oxygen mole fraction in the chamber
-default	SysConst	UserCal		list												List containing user calibration
-default	SysConst	FactCal		list												List containing factory calibration
-	Const															Constants required for gas-exchange equations
-default	Const	Geometry		character				Geometry								Text string specifying chamber geometry, used for calculating GasEx.gbw
-default	Const	S	italic(S)	cm2		area	cm2	S	Area	cm2	Area			Aleaf	cm2	Leaf area
-default	Const	K	italic(K)	numeric	0.5			K	StmRat	numeric				StomataR	numeric	Stomatal ratio
-default	Const	CustomBLC		mol m-2 s-1	1			Custom	BLC_1	mol m-2 s-1						One-sided boundary layer conductance
-cuticular_conductance	Const	gcw	italic(g)[cw]	mol*m^-2*s^-1	0											User-specified cuticular conductance to water vapor
-cuticular_conductance	Const	gcc	italic(g)[cc]	mol*m^-2*s^-1	0											User-specified cuticular conductance to CO2
-default	Const	RL	italic(R)[L]	µmol m-2 s-1		Rday	µmol m-2 s-1									User-specified mitochondrial respiration in the light
-default	Const	GammaStar	"Gamma^{""*""}"	µmol mol-1												User-specified CO2 photocompensation point (as mole fraction!)
-default	Const	UseDynamic		logical	FALSE											Specifies whether or not to use non-steady state equations
-	GasEx															Variables related to gas-exchange calculations
-default	GasEx	Time		posix				TIME								Unix time stamp for the measurement
-default	GasEx	E	italic(E)	mol m-2 s-1				E			E					Transpiration rate
-default	GasEx	Emm	italic(E)	mmol m-2 s-1		E	mmol m-2 s-1	Emm	Trmmol	mmol m-2 s-1				E	mmol m-2 s-1	Transpiration rate in mmol per square meter per second
-default	GasEx	A	italic(A)	µmol m-2 s-1		A	µmol m-2 s-1	A	Photo	µmol m-2 s-1	A			A	µmol m-2 s-1	Net assimilation rate
-default	GasEx	Ca	italic(C)[a]	µmol mol-1				Ca								CO2 mole fraction in ambient air
-default	GasEx	Cs	italic(C)[s]	µmol mol-1												CO2 mole fraction at the leaf surface
-default	GasEx	Ci	italic(C)[i]	µmol mol-1		Ci	µmol mol-1	Ci	Ci	µmol mol-1	ci			Ci	µmol mol-1	CO2 mole fraction in intercellular airspaces
-default	GasEx	pCi	italic(p)[C[i]]	Pa				Pci								Intercellular CO2 in partial pressure units
-default	GasEx	pCa	italic(p)[C[a]]	Pa				Pca								Ambient CO2 in partial pressure units
-default	GasEx	gsw	italic(g)[sw]	mol m-2 s-1		gsw	mmol m-2 s-1	gsw						gs	mmol m-2 s-1	Stomatal conductance to water vapor
-default	GasEx	gbw	italic(g)[bw]	mol m-2 s-1		gbw	mmol m-2 s-1	gbw								Boundary layer conductance to water vapor
-default	GasEx	gtc	italic(g)[tc]	mol m-2 s-1				gtc								Total conductance to CO2
-default	GasEx	gtw	italic(g)[tw]	mol m-2 s-1				gtw	Cond	mol m-2 s-1	GH2O					Total conductance to water vapor
-default	GasEx	Rabs	italic(R)[abs]	W m-2				Rabs								Absorbed short wave radiation contribution to the energy balance
-default	GasEx	TleafEB	"italic(T)[""leaf,EB""]"	°C				TleafEB								Leaf temperature from energy balance
-default	GasEx	TleafCnd	"italic(T)[""leaf,Cnd""]"	°C		Tleaf	°C	TleafCnd	CTleaf	°C						Leaf temperature used for gas-exchange computations
-default	GasEx	TairCnd	"italic(T)[""air,Cnd""]"	°C		Tair	°C									Air temperature used for gas-exchange computations
-default	GasEx	SVPleaf	SVP[leaf]	kPa				SVPleaf								Saturation vapor pressure at leaf temperature
-default	GasEx	RHcham	RH[cham]	%		RHs	%	RHcham	RH_S	%	rh			RH	%	Relative humidity in the chamber
-default	GasEx	VPcham	VP[cham]	kPa				VPcham	vapS_kPa	kPa						Vapor pressure in the chamber
-default	GasEx	SVPcham	SVP[cham]	kPa				SVPcham								Saturation vapor pressure in the chamber
-default	GasEx	VPDleaf	VPD[leaf]	kPa		VPDleaf	kPa	VPDleaf	VpdL	kPa				VPD	kPa	Vapor pressure deficit at leaf temperature
-default	GasEx	LatHFlux	italic(E)[l]	W m-2				LatHFlux								Latent heat flux contribution to the energy balance
-default	GasEx	SenHFlux	italic(H)[l]	W m-2				SenHFlux								Sensible Heat Flux contribution to the energy balance
-default	GasEx	NetTherm		W m-2				NetTherm								Net thermal contribution to the energy balance
-default	GasEx	EBSum		W m-2				EBSum								Sum of all energy balance components
-default	GasEx	Asty	italic(A)[sty]	µmol m-2 s-1				Asty								Net assimilation rate calculated using steady state equations
-default	GasEx	Esty	italic(E)[sty]	mmol m-2 s-1				Esty								Transpiration rate calculated using steady state equations
-	Dynamic															Variables related to non-steady-state gas-exchange calculations
-default	Dynamic	Adyn	italic(A)[dyn]	µmol m-2 s-1				Adyn								Net assimilation rate, calculated for non-steady state conditions
-default	Dynamic	Crd	italic(C)[rd]	µmol mol-1				Crd			CO2buf					Non-steady state, dry-equivalent reference CO2
-default	Dynamic	Csd	italic(C)[sd]	µmol mol-1				Csd								Non-steady state, dry-equivalent sample CO2
-default	Dynamic	dCsd_dt	"d*italic(C)[sd]*""/""*d*italic(t)"	µmol mol-1 s-1				dCsd/dt								Rate of change of Csd
-default	Dynamic	alphaVc	alpha*italic(V)[c]	cm3				αVc								Effective CO2 Volume of the gas-exchange chamber
-default	Dynamic	Edyn	italic(E)[dyn]	mmol m-2 s-1				Edyn								Evapotranspiration calculated for non-steady state conditions
-default	Dynamic	Hr	italic(H)[r]	mmol mol-1				Hr								Non-steady state reference H2O
-default	Dynamic	Hs	italic(H)[s]	mmol mol-1				Hs								Non-steady state sample H2O
-default	Dynamic	dHs_dt	"d*italic(H)[s]*""/""*d*italic(t)"	mmol mol-1 s-1				dHs/dt								Rate of change of Hs
-default	Dynamic	alphaVh	alpha*italic(V)[h]	cm3				αVh								Effective H2O Volume
-	LeafQ															Variables related to light intensity in the chamber
-default	LeafQ	Qabs	"italic(Q)[""abs""]"	µmol m-2 s-1				Qabs								PPFD absorbed by the leaf
-default	LeafQ	Qin	"italic(Q)[""in""]"	µmol m-2 s-1		Qin	µmol m-2 s-1	Qin								PPFD incident on the leaf
-default	LeafQ	alpha	alpha	numeric		alpha		alpha	LeafAbs							PPFD absorptance
-default	LeafQ	Conv		J µmol-1				convert								Conversion from PPFD to Watts per square meter
-	Leak															Variables related to leak corrections
-default	Leak	Leak		µmol s-1				Leak								Leakage from chamber
-default	Leak	LeakPct		%				LeakPct								Leakage as percent of flow
-default	Leak	CorrFact		numeric	1			CorrFact								Leak correction factor
-default	Leak	CorrFactPct		%				CorrFactPct								Leak correction factor as percent
-default	Leak	Fan		µmol s-1				Fan								Estimated mixing fan flow
-	FLR															Variables related to chlorophyll fluorescence
-default	FLR	Fo	italic(F)[o]	numeric				Fo	Fo	numeric	Fo			Fo	numeric	Dark-adapted, minimal fluorescence
-default	FLR	Fm	italic(F)[m]	numeric				Fm	Fm	numeric	Fm			Fm	numeric	Dark-adapted maximal fluorescence
-default	FLR	Fv_Fm	"italic(F)[v]*""/""*italic(F)[m]"	numeric				Fv/Fm	Fv/Fm	numeric	Fv/Fm			FvFm	numeric	Maximum quantum efficiency of PSII photochemistry
-default	FLR	Adark		µmol m-2 s-1				A_dark	Adark	numeric						Dark assimilation rate before Fm
-default	FLR	Fs	italic(F)[s]	numeric				Fs	Fs	numeric	F			Fs	numeric	Steady state fluorescence
-default	FLR	Fmp	"italic(F)*""\U2032""[m]"	numeric				Fm'	Fm'	numeric	Fm'			FmP	numeric	Light-adapted maximal fluorescence
-default	FLR	phiPS2	Phi[PSII]	numeric				PhiPS2	PhiPS2	numeric	Yield			phiPSII	numeric	Operating quantum efficiency of Photosystem II in the light
-default	FLR	fPS2	beta	numeric				PS2/1	PS2/1	numeric						Fraction of energy partitioned to PS2
-default	FLR	QabsFs	"italic(Q)[""abs,Fs""]"	µmol m-2 s-1				Qabs_fs								Light quanta absorbed at Fs
-default	FLR	AFs	italic(A)[Fs]	µmol m-2 s-1				A_fs								Net assimilation rate at Fs
-default	FLR	ETR	italic(J)[F]	µmol m-2 s-1				ETR	ETR	numeric	ETR			J	µmol m-2 s-1	Electron transport rate calculated from chlorophyll fluorescence
-default	FLR	phiCO2	"Phi[""CO2""]"	mol mol-1		PhiCO2a	mol mol-1	PhiCO2	PhiCO2	numeric						Quantum efficency of the carboxylation rate, based on absorbed irradiance
-default	FLR	NPQ		numeric				NPQ	NPQ	numeric	NPQ			NPQ	numeric	Non-photochemical quenching
-default	FLR	FopAlt	"italic(F)*""\U2032""[""o,alt""]"	numeric				alt. Fo'			Fo'calc					Alternative estimate for Fo' : Fo/(Fv/Fm+Fo/Fm')
-default	FLR	Fop	"italic(F)*""\U2032""[o]"	numeric				Fo'	Fo'	numeric	Fo'			FoP	numeric	Light-adapted minimal fluorescence
-default	FLR	Fvp_Fmp	"italic(F)*""\U2032""[v] *""/""* italic(F)*""\U2032""[m]"	numeric				Fv'/Fm'	Fv'/Fm'	numeric				FvFmP	numeric	Maximum quantum efficiency of PSII in the light, if all reaction-centres were open
-default	FLR	qP	italic(q)[P]	numeric				qP	qP	numeric	qP			qP	numeric	Photochemical quenching coefficient
-default	FLR	qPFo	"italic(q)[""P,Fo""]"	numeric				qP_Fo								Photochemical quenching coefficient, using Fo instead of Fo'
-default	FLR	qN	italic(q)[N]	numeric				qN	qN	numeric				qNP	numeric	Non-photochemical quenching coefficient
-default	FLR	qNFo	"italic(q)[""N,Fo""]"	numeric				qN_Fo								Non-photochemical quenching coefficient, using Fo instead of Fo'
-default	FLR	qL	italic(q)[L]	numeric				qL			qL			qL	numeric	An estimate for the fraction of open PSII centres
-default	FLR	QinFs	"italic(Q)[""in,Fs""]"	numeric					ParIn@Fs	numeric						Light intensity measured at Fs
-default	FLR	PhiQin_4	"Phi[PSII]*italic(Q)[""in""]*""/""*4"	µmol m-2 s-1												A convenience parameter for some analyses. PhiPS2 x Qin/4
-gm_fluorescence	FLR	gm	"italic(g)[""m,flr""]"	mol m-2 s-1 Pa-1												Mesophyll conductance derived from fluorescence
-gm_fluorescence	FLR	Cc	"italic(C)[""c,flr""]"	µmol mol-1												Chloroplast CO2 mole fraction derived from fluorescence
-	MPF															
-	FastKntcs															
-	FlrStats															Statistics related to chlorophyll fluorescence
-default	FlrStats	Favg	italic(F)[avg]	numeric				F_avg	Fmean	numeric						Average fluorescence
-default	FlrStats	dF_dt	"d*italic(F)*""/""*d*italic(t)"	min-1				dF/dt	dF/dt	numeric						Rate of change of the fluorescence
-default	FlrStats	Period		s				period								Period used for calculating statistics
-d13C	d13CConst	ab	italic(a)[b]	‰	2.9											13C fractionation associated with diffusion through air boundary layers
-d13C	d13CConst	as	italic(a)[s]	‰	4.4											13C fractionation associated with free diffusion through air
-d13C	d13CConst	am	italic(a)[m]	‰	1.8											13C fractionation associated with diffusion through liquid
-d13C	d13CConst	b	italic(b)	‰	30											13C fractionation associated with carboxylation
-d13C	d13CConst	e	italic(e)	‰	-3											13C fractionation associated with mitochondrial respiration
-d13C	d13CConst	f	italic(f)	‰	11.6											13C fractionation associated with photorespiration
-d13C	d13CConst	delta13CO2g	"delta^{13}*C*""-""*CO[""2,g""]"	‰	-8.5											Isotopic composition of CO2 in the air during growth conditions
-d13C	d13CConst	Deltag	Delta[o]^{growth}	‰												Observed discrimination against 13CO2, measured under ambient growth conditions
-d13C	d13CMeas	delta13CO2s	"delta^{13}*C*""-""*CO[""2,s""]"	‰												Isotopic composition of sample CO2
-d13C	d13CMeas	delta13CO2r	"delta^{13}*C*""-""*CO[""2,r""]"	‰												Isotopic composition of the reference CO2
-d13C	d13C	xi	xi	numeric												The inverse of the relative drawdown of dry-equivalent CO2 in the leaf chamber
-d13C	d13C	ap	"italic(a)*""\U2032"""	‰												Weighted 13C fractionation associated with air and boundary layers
-d13C	d13C	ep	"italic(e)*""\U2032"""	‰												Corrected fractionation associated with respiration
-d13C	d13C	t	italic(t)	numeric												A ternary correction factor
-d13C	d13C	Deltai	Delta[i]	‰												Model-predicted discrimination against 13CO2
-d13C	d13C	Deltao	Delta[o]	‰												Observed discrimination against 13CO2
-d13C	d13C	DeltaiDeltao	Delta[i]-Delta[o]	‰												Difference between predicted and observed discrimination against 13CO2
-d13C	d13C	A_pCa	"italic(A)*""/""*italic(p)[C[a]]"	µmol m-2 s-1 Pa-1												Ratio between net assimilation and the partial pressure of CO2 in the ambient air
-d13C	d13C	gm	"italic(g)[m*"",""^{13}*C]"	mol m-2 s-1 Pa-1												Mesophyll conductance derived from carbon isotope discrimination
-d13C	d13C	Cc	"italic(C)[c*"",""^{13}*C]"	µmol mol-1												Chloroplast CO2 derived from carbon isotope discrimination
-	Meas															Measurement variables for gas-exchange calculations
-default	Meas	Time	Time	posix				TIME								Unix time stamp for the measurement
-default	Meas	Flow	Flow	µmol s-1		flow	µmol s-1	Flow	Flow	µmol s-1	Flow					Flow rate into the chamber
-default	Meas	Pa	italic(P)[a]	kPa	101.3	Patm	kPa	Pa	Press	kPa	Pamb	Pr	mbar	Patm	mbar	Atmospheric pressure
-default	Meas	DeltaPcham	Delta*P[cham]	kPa	0			ΔPcham						Pcuv	mbar	Chamber overpressure
-default	Meas	Tamb	italic(T)[amb]	°C							Tamb			Tamb	°C	Ambient temperature sensor
-default	Meas	Tair	italic(T)[air]	°C				Tair	Tair	°C	Tcuv			Tcuv	°C	Chamber air temperature
-default	Meas	Tleaf	italic(T)[leaf]	°C				Tleaf	Tleaf	°C	Tleaf			Tleaf	°C	Leaf thermocouple 1
-default	Meas	Tleaf2	italic(T)[leaf2]	°C				Tleaf2								Leaf thermocouple 2
-default	Meas	TleafOffset		°C				Offset								Offset correction for Tleaf
-default	Meas	Tleaf2Offset		°C				Offset2								Offset correction for Tleaf2
-default	Meas	FanSpeed		numeric	0			Fan_speed			Imp					Chamber fan speed
-default	Meas	QambIn	"italic(Q)[""amb,in""]"	µmol m-2 s-1				Qamb_in	PARi	µmol m-2 s-1	PARtop			PARi	µmol m-2 s-1	In-chamber ambient PPFD
-default	Meas	QambInBot	"italic(Q)[""amb,in,bot""]"	µmol m-2 s-1							PARbot					In-chamber ambient PPFD from the bottom
-default	Meas	QambOut	"italic(Q)[""amb,out""]"	µmol m-2 s-1		Qout	µmol m-2 s-1	Qamb_out	PARo	µmol m-2 s-1	PARamb			PARe	µmol m-2 s-1	External ambient PPFD
-default	Meas	CO2s	"""[""*CO[2]*""]""[s]"	µmol mol-1		CO2s	µmol mol-1	CO2_s	CO2S	µmol mol-1	ca	CO2a	µmol mol-1	CO2a	µmol mol-1	CO2 mole fraction in wet air leaving the chamber
-default	Meas	CO2a	"""[""*CO[2]*""]""[a]"	µmol mol-1				CO2_a								CO2 mole fraction in wet air leaving the chamber, before match correction
-default	Meas	CO2r	"""[""*CO[2]*""]""[r]"	µmol mol-1		CO2r	µmol mol-1	CO2_r	CO2R	µmol mol-1	CO2abs	CO2r	µmol mol-1	CO2r	µmol mol-1	CO2 mole fraction in wet air entering the chamber
-default	Meas	H2Os	"""[""*H[2]*O*""]""[s]"	mmol mol-1		H2Os	µmol mol-1	H2O_s	H2OS	µmol mol-1	wa	H2Oa	mbar	H2Oa	mmol mol-1	H2O mole fraction in air leaving the chamber
-default	Meas	H2Oa	"""[""*H[2]*O*""]""[a]"	mmol mol-1				H2O_a								H2O mole fraction in air leaving the chamber, before match correction
-default	Meas	H2Or	"""[""*H[2]*O*""]""[r]"	mmol mol-1		H2Or	µmol mol-1	H2O_r	H2OR	µmol mol-1		H2Or	mbar	H2Or	mmol mol-1	H2O mole fraction in air entering the chamber
-default	Meas2	TdR	"italic(T)[""d,r""]"	°C				Td_r	TdR	°C						Reference cell dew point
-default	Meas2	TdS	"italic(T)[""d,s""]"	°C				Td_s	TdS	°C						Sample cell dew point
-	MchEvent															Variables related to the latest match
-default	MchEvent	Time		posix				time								Unix time stamp of the last match
-default	MchEvent	HHMMSS		character				hhmmss								Time of last match as character string
-default	MchEvent	CO2time		posix				co2_t								Unix time stamp of the last CO2 match
-default	MchEvent	H2Otime		posix				h2o_t								Unix time stamp of the last H2O match
-default	MchEvent	Count		integer				count								Match count number
-default	MchEvent	CO2adj		µmol mol-1				co2_adj								CO2r - CO2s at last point match
-default	MchEvent	H2Oadj		mmol mol-1				h2o_adj								H2Or - H2Os at last point match
-default	MchEvent	CO2pMatch		µmol mol-1				co2_match	CsMch							CO2r - CO2a at last point match
-default	MchEvent	H2OpMatch		mmol mol-1				h2o_match	HsMch							H2Or - H2Oa at last point match
-default	MchEvent	CO2at		µmol mol-1				co2_at	matchCO2							CO2 at last match
-default	MchEvent	H2Oat		mmol mol-1				h2o_at	matchH2O							H2O at last match
-	MchStatus															Values associated with the current match
-default	MchStatus	MatchCO2		µmol mol-1				MatchCO2								Currently used CO2 match adjustment value
-default	MchStatus	MatchH2O		mmol mol-1				MatchH2O								Currently used H2O match adjustment value
-default	MchStatus	CFaCO2		numeric				cf_co2_a								CO2 match coefficient
-default	MchStatus	CFbCO2		numeric				cf_co2_b								CO2 match coefficient
-default	MchStatus	CFcCO2		numeric				cf_co2_c								CO2 match coefficient
-default	MchStatus	CFdCO2		numeric				cf_co2_d								CO2 match coefficient
-default	MchStatus	CFaH2O		numeric				cf_h2o_a								H2O match coefficient
-default	MchStatus	CFbH2O		numeric				cf_h2o_b								H2O match coefficient
-default	MchStatus	CFcH2O		numeric				cf_h2o_c								H2O match coefficient
-default	MchStatus	CFdH2O		numeric				cf_h2o_d								H2O match coefficient
-default	MchStatus	CO2fitLow		µmol mol-1				co2_fit_low								CO2 range match fit lower limit
-default	MchStatus	CO2fitHigh		µmol mol-1				co2_fit_high								CO2 range match fit upper limit
-default	MchStatus	H2OfitLow		mmol mol-1				h2o_fit_low								H2O range match fit lower limit
-default	MchStatus	H2OfitHigh		mmol mol-1				h2o_fit_high								H2O range match fit upper limit
-default	MchStatus	Status		character												Free-text match status information
-	FlrLS															Variables associated with fluorometer light sources
-default	FlrLS	Q		µmol m-2 s-1				Q								Fluorometer photon flux density
-default	FlrLS	fred		1				f_red								Fraction red
-default	FlrLS	fgreen		1												Fraction green
-default	FlrLS	fblue		1				f_blue								Fraction blue
-default	FlrLS	fwhite		1												Fraction white
-default	FlrLS	ffarred		1				f_farred								Fraction far red
-default	FlrLS	F		numeric				F	F	numeric				F	numeric	Demodulated fluorescence
-default	FlrLS	Qmodavg		µmol m-2 s-1				Q_modavg								Modulated contribution to FlrLS.Q
-default	FlrLS	Qred		µmol m-2 s-1				Q_red								Red actinic contribution to FlrLS.Q
-default	FlrLS	Qblue		µmol m-2 s-1				Q_blue								Blue actinic contribution to FlrLS.Q
-default	FlrLS	Qfarred		µmol m-2 s-1				Q_farred								Far red contribution to FlrLS.Q
-default	FlrLS	State		numeric				state								Specifies flash type: 0=Normal, 1=Rect, 2=MPF, 3=Ind, 4=Dark
-default	FlrLS	Status		character										Status.1	character	Additional free text status information related to the fluorometer
-	HeadLS															Variables associated with the head light source
-default	HeadLS	Q		µmol m-2 s-1				Q								Head light source output
-default	HeadLS	fred		1				f_red						Red	%	Head light source, fraction red
-default	HeadLS	fgreen		1				f_green						Green	%	Head light source, fraction green
-default	HeadLS	fblue		1				f_blue						Blue	%	Head light source, fraction blue
-default	HeadLS	fwhite		1				f_white						White	%	Head light source, fraction white
-default	HeadLS	ffarred		1										FarRed	%	Head light source, fraction far red
-	ConsoleLS															Variables related to an external light source
-default	ConsoleLS	Q		µmol m-2 s-1				Q								Console light source intensity
-default	ConsoleLS	fred		1				f_red								Console light source, fraction of red light
-default	ConsoleLS	fgreen		1				f_green								Console light source,fraction of green light
-default	ConsoleLS	fblue		1				f_blue								Console light source, fraction of blue light
-default	ConsoleLS	fwhite		1				f_white								Console light source, fraction of white light
-	Stability															Content depends on what variables are being targeted for stability checking.
-default	Stability	Stable		integer				Stable	State	logical						Number of stable variables
-default	Stability	Total		integer				Total								Number of variables  tracked
-default	Stability	State		character				State								stable variables / total variables
-	Raw															Low-level instrument data.
-default	Raw	CO2aAbs		numeric				abs_c_a								CO2 absorptance sample cell
-default	Raw	CO2rAbs		numeric				abs_c_b								CO2 absorptance reference cell
-default	Raw	H2OaAbs		numeric				abs_h_a								H2O absorptance sample cell
-default	Raw	H2OrAbs		numeric				abs_h_b								H2O absorptance reference cell
-default	Raw	H2Oa		mmol mol-1												back-calculated H2O in mole fraction, sample cell
-default	Raw	H2Or		mmol mol-1							H2Oabs					back-calculated H2O in mole fraction, reference cell
-default	Raw	CO2aAbsP		kPa-1												back-calculated CO2 in absorptance per kPa, sample cell
-default	Raw	CO2rAbsP		kPa-1												back-calculated CO2 in absorptance per kPa, reference cell
-	Status															Information on the state of the instrument
-default	Status	FlowS		µmol s-1				Flow_s								Sample cell flow
-default	Status	FlowR		µmol s-1				Flow_r								Reference cell flow
-default	Status	Txchg	italic(T)[xchg]	°C				Txchg	TBlk	°C						Heat exchanger temperature
-default	Status	Tirga	italic(T)[irga]	°C				Tirga				Tirga	°C			IRGA block temperature
-default	Status	Ts		°C				Ts								A cell inlet temperature
-default	Status	Tr		°C				Tr								B cell inlet temperature
-default	Status	Status		character					Status	character	Status	Status	character	Status	character	Free text status information
-	LeakConst															Constants associated with leak corrections
-default	LeakConst	FsMeas		character				Fs_meas								Character string with measured FlowS adjustement
-default	LeakConst	FsTrue		character				Fs_true								Character string with true FlowS adjustment
-default	LeakConst	CFaFan		numeric				fan_a								Fan flow calibration coefficient
-default	LeakConst	CFbFan		numeric				fan_b								Fan flow calibration coefficient
-default	LeakConst	CFcFan		numeric				fan_c								Fan flow calibration coefficient
-default	LeakConst	CFdFan		numeric				fan_d								Fan flow calibration coefficient
-default	LeakConst	LeakWt		numeric	0			leak_wt								Leak weighting factor
-	ChambConst															Chamber specific constants
-default	ChambConst	Aperture		cm2				Aperture								Aperture used for the chamber
-default	ChambConst	PoBLC		kPa				blc_Po								Pressure for calculation of GasEx.gbw
-default	ChambConst	CFaBLC		numeric				blc_a								LI6800 specific coefficient for GasEx.gbw
-default	ChambConst	CFbBLC		numeric				blc_b								LI6800 specific coefficient for GasEx.gbw
-default	ChambConst	CFcBLC		numeric				blc_c								LI6800 specific coefficient for GasEx.gbw
-default	ChambConst	CFdBLC		numeric				blc_d								LI6800 specific coefficient for GasEx.gbw
-default	ChambConst	CFeBLC		numeric				blc_e								LI6800 specific coefficient for GasEx.gbw
-default	ChambConst	SmaxBLC		cm2				blc_maxS								LI6800 specific max. area for GasEx.gbw calculation
-default	ChambConst	SminBLC		cm2				blc_minS								LI6800 specific min. area for GasEx.gbw calculation
-default	ChambConst	SslopeBLC		numeric				blc_S_slope	BLCslope	numeric						LI6400 specific coefficient for GasEx.gbw
-default	ChambConst	SoffsetBLC		numeric				blc_S_offset	BLCoffst	numeric						LI6400 specific coefficient for GasEx.gbw
-	LTConst															Constants associated with temperature measurements
-default	LTConst	deltaTw	Delta*italic(T)[w]	K	0			deltaTw								Wall-air temp difference
-default	LTConst	fT1		1	1			fT1								Fraction of TleafCnd measured by Tleaf
-default	LTConst	fT2		1	0			fT2								Fraction of TleafCnd measured by Tleaf2
-default	LTConst	fTEB		1	0			fTeb	EBal?	logical						Fraction of TleafCnd measured by TleafEB
-default	QConst	fQambIn		1	0			fQ_Amb_in								Fraction of PPFD coming from in-chamber ambient light
-default	QConst	fQambOut		1	0			fQ_Amb_out								Fraction of PPFD coming from external ambient light
-default	QConst	fQconsoleLS		1	0			fQ_ConsoleLS								Fraction of PPFD coming from a console light source
-default	QConst	fQflr		1	0			fQ_Flr								Fraction of PPFD coming from the fluorometer
-default	QConst	fQheadLS		1	0			fQ_HeadLS								Fraction of PPFD coming from the head light source
-default	QConst	fQin		1	1				f_parin	numeric						Fraction of Meas.QambIn used for energy-balance calculations
-default	QConst	fQout		1	0				f_parout	numeric						Fraction of Meas.QambOut used for energy-balance calculations
-	LQConst															Constants related to LeafQ computations
-default	LQConst	Ambient		character				Ambient								Ambient light identifier
-default	LQConst	Leaf		character				Leaf								Leaf type identifier
-default	LQConst	AbsAmbient	alpha[ambient]	numeric	0.8			abs_ambient			ETR-Fac					Leaf absorptance for ambient
-default	LQConst	BlueAbsFlr		numeric				abs_blueFlr	BlueAbs	numeric						Leaf absorptance for blueFlr
-default	LQConst	BlueAbsLED		numeric				abs_blueLED								Leaf absorptance for blueLED
-default	LQConst	GreenAbsLED		numeric				abs_greenLED								Leaf absorptance for greenLED
-default	LQConst	RedAbsFlr		numeric				abs_redFlr	RedAbs	numeric						Leaf absorptance for redFlr
-default	LQConst	RedAbsLED		numeric				abs_redLED								Leaf absorptance for redLED
-default	LQConst	WhiteAbsLED		numeric				abs_whiteLED								Leaf absorptance for whiteLED
-default	LQConst	ConvAmbient		J µmol-1				k_ambient	alphaK	numeric						Converts Qin to Rabs for ambient
-default	LQConst	BlueConvFlr		J µmol-1				k_blueFlr								Converts Qin to Rabs for blueFlr
-default	LQConst	BlueConvLED		J µmol-1				k_blueLED								Converts Qin to Rabs for blueLED
-default	LQConst	GreenConvLED		J µmol-1				k_greenLED								Converts Qin to Rabs for greenLED
-default	LQConst	RedConvFlr		J µmol-1				k_redFlr								Converts Qin to Rabs for redFlr
-default	LQConst	RedConvLED		J µmol-1				k_redLED								Converts Qin to Rabs for redLED
-default	LQConst	WhiteConvLED		J µmol-1				k_whiteLED								Converts Qin to Rabs for whiteLED
-	Auxilarry															Settings and measurements associated with auxilarry I/O
-default	Auxilarry	IO1		V				I/O1			Aux1	AN1	V			Auxillary analog IO
-default	Auxilarry	IO2		V				I/O2			Aux2	AN2	V			Auxillary analog IO
-default	Auxilarry	IO3		V				I/O3								Auxillary analog IO
-default	Auxilarry	IO4		V				I/O4								Auxillary analog IO
-default	Auxilarry	IO5		V				I/O5								Auxillary analog IO
-default	Auxilarry	IO6		V				I/O6								Auxillary analog IO
-default	Auxilarry	IO7		V				I/O7								Auxillary analog IO
-default	Auxilarry	IO8		V				I/O8								Auxillary analog IO
-	UserDefCon															User-defined constants
-	UserDefVar															User-defined variables
-default	UserDefVar	Object		integer							Object					User-defined object number
-default	UserDefVar	Comment		character							Comment			Comment	character	User-defined free-text comment
-	Li6400															Li6400 specific data
-	GFS3000															GFS-3000 specific data
-	CIRAS3															CIRAS-3 specific data
-	CIRAS4															CIRAS-4 specific data
-default	gasanalyzer															Information for the R package gasexchangeR
-default	gasanalyzer	UseEqUnits		logical	FALSE											Specifies whether or not the latest calculations enforced units
-default	gasanalyzer	Equations		list												A list of gas-exchange equations
-default	gasanalyzer	Version		character												Version number of gasanalyzer used to generate this list
+useflag	group	unified	plotmath	units	default	ESSDIVE	ESSDIVEunits	Li6800group	Li6800	Li6400	Li6400units	GFS3000	CIRAS3	CIRAS3units	CIRAS4	CIRAS4units	description
+	SysObs																System variables
+default	SysObs	Obs		integer				SysObs	Obs	Obs	integer						Observation number
+default	SysObs	Time		posix				SysObs	time						TIMESTAMP	posix	Unix time stamp (seconds since 00:00:00 UTC on 1 January 1970) of the current observation
+default	SysObs	Elapsed		s				SysObs	elapsed	FTime	s						Seconds since first observation
+default	SysObs	Date		character		date		SysObs	date			Date					Date in local timezone of the current observation as character string
+default	SysObs	HHMMSS		character		time		SysObs	hhmmss	HHMMSS	character	Time					Time in local timezone of the current observation as character string
+default	SysObs	Averaging		s				SysObs	averaging								Additional averaging on current observation
+default	SysObs	Instrument		character													The instrument type used to collect this data
+default	SysObs	Serial		character													The serial number of the instrument
+default	SysConst																Low-level system constants or configuration
+default	SysConst	AvgTime		s				SysConst	AvgTime								Averaging time for measurements
+default	SysConst	Geometry		character				Const	Geometry								Text string specifying chamber geometry, used for calculating GasEx.gbw
+default	SysConst	UserCal		list													List containing user calibration
+default	SysConst	FactCal		list													List containing factory calibration
+default	SysConst	UseDynamic		logical	FALSE			Const	UseDynamic								Specifies whether or not to use non-steady state equations
+default	SysConst	TleafOffset		°C				Meas	Offset								Offset correction for Tleaf
+default	SysConst	Tleaf2Offset		°C				Meas	Offset2								Offset correction for Tleaf2
+	Const																Constants related to the protocol or biological constants
+default	Const	S	italic(S)	cm2		area	cm2	Const	S	Area	cm2	Area			Aleaf	cm2	Leaf area
+default	Const	K	italic(K)	numeric	0.5			Const	K	StmRat	numeric				StomataR	numeric	Stomatal ratio
+default	Const	CustomBLC		mol m-2 s-1	1			Const	Custom	BLC_1	mol m-2 s-1						One-sided boundary layer conductance
+cuticular_conductance	Const	gcw	italic(g)[cw]	mol*m^-2*s^-1	0												User-specified cuticular conductance to water vapor
+cuticular_conductance	Const	gcc	italic(g)[cc]	mol*m^-2*s^-1	0												User-specified cuticular conductance to CO2
+default	Const	RL	italic(R)[L]	µmol m-2 s-1		Rday	µmol m-2 s-1										User-specified mitochondrial respiration in the light
+default	Const	GammaStar	"Gamma^{""*""}"	µmol mol-1													User-specified CO2 photocompensation point (as mole fraction!)
+default	Const	RHi	RH[i]	%	100												User-specified relative humidity in the substomatal cavity. 
+default	Const	Oxygen	"""[""*O[2]*""]"""	%	21	Oi	mmol mol-1	SysConst	Oxygen	Oxygen%	%	Oxygen					Oxygen mole fraction in the chamber
+default	Const	fPS2	beta	numeric				FLR	PS2/1	PS2/1	numeric						Fraction of energy partitioned to PS2
+	GasEx																Variables related to gas-exchange calculations
+default	GasEx	Time		posix				GasEx	TIME								Unix time stamp for the measurement
+default	GasEx	E	italic(E)	mol m-2 s-1				GasEx	E	Trans	mol m-2 s-1	E					Transpiration rate
+default	GasEx	Emm	italic(E)	mmol m-2 s-1		E	mmol m-2 s-1	GasEx	Emm	Trmmol	mmol m-2 s-1				E	mmol m-2 s-1	Transpiration rate in mmol per square meter per second
+default	GasEx	A	italic(A)	µmol m-2 s-1		A	µmol m-2 s-1	GasEx	A	Photo	µmol m-2 s-1	A			A	µmol m-2 s-1	Net assimilation rate
+default	GasEx	Ca	italic(C)[a]	µmol mol-1				GasEx	Ca								CO2 mole fraction in ambient air
+default	GasEx	Cs	italic(C)[s]	µmol mol-1													CO2 mole fraction at the leaf surface
+default	GasEx	Ci	italic(C)[i]	µmol mol-1		Ci	µmol mol-1	GasEx	Ci	Ci	µmol mol-1	ci			Ci	µmol mol-1	CO2 mole fraction in intercellular airspaces
+default	GasEx	pCi	italic(p)[C[i]]	Pa				GasEx	Pci	Ci_Pa	µmol mol-1						Intercellular CO2 in partial pressure units
+default	GasEx	pCa	italic(p)[C[a]]	Pa				GasEx	Pca								Ambient CO2 in partial pressure units
+default	GasEx	gsw	italic(g)[sw]	mol m-2 s-1		gsw	mmol m-2 s-1	GasEx	gsw	Cond	mol m-2 s-1				gs	mmol m-2 s-1	Stomatal conductance to water vapor
+default	GasEx	gbw	italic(g)[bw]	mol m-2 s-1		gbw	mmol m-2 s-1	GasEx	gbw								Boundary layer conductance to water vapor
+default	GasEx	gtc	italic(g)[tc]	mol m-2 s-1				GasEx	gtc	CndCO2	mol m-2 s-1						Total conductance to CO2
+default	GasEx	gtw	italic(g)[tw]	mol m-2 s-1				GasEx	gtw	CndTotal	mol m-2 s-1	GH2O					Total conductance to water vapor
+default	GasEx	Rabs	italic(R)[abs]	W m-2				GasEx	Rabs	R(W/m2)	W m-2						Absorbed short wave radiation contribution to the energy balance
+default	GasEx	TleafEB	"italic(T)[""leaf,EB""]"	°C				GasEx	TleafEB								Leaf temperature from energy balance
+default	GasEx	TleafCnd	"italic(T)[""leaf,Cnd""]"	°C		Tleaf	°C	GasEx	TleafCnd	CTleaf	°C						Leaf temperature used for gas-exchange computations
+default	GasEx	TairCnd	"italic(T)[""air,Cnd""]"	°C		Tair	°C			CTair	°C						Air temperature used for gas-exchange computations
+default	GasEx	SVPleaf	SVP[leaf]	kPa				GasEx	SVPleaf	SVTleaf	kPa						Saturation vapor pressure at leaf temperature
+default	GasEx	RHcham	RH[cham]	%		RHs	%	GasEx	RHcham	RH_S	%	rh			RH	%	Relative humidity in the chamber
+default	GasEx	VPcham	VP[cham]	kPa				GasEx	VPcham	vapS_kPa	kPa						Vapor pressure in the chamber
+default	GasEx	SVPcham	SVP[cham]	kPa				GasEx	SVPcham	SVTair	kPa						Saturation vapor pressure in the chamber
+default	GasEx	VPDleaf	VPD[leaf]	kPa		VPDleaf	kPa	GasEx	VPDleaf	VpdL	kPa				VPD	kPa	Vapor pressure deficit at leaf temperature
+default	GasEx	LatHFlux	italic(E)[l]	W m-2				GasEx	LatHFlux								Latent heat flux contribution to the energy balance
+default	GasEx	SenHFlux	italic(H)[l]	W m-2				GasEx	SenHFlux								Sensible Heat Flux contribution to the energy balance
+default	GasEx	NetTherm		W m-2				GasEx	NetTherm								Net thermal contribution to the energy balance
+default	GasEx	EBSum		W m-2				GasEx	EBSum								Sum of all energy balance components
+default	GasEx	Asty	italic(A)[sty]	µmol m-2 s-1				GasEx	Asty								Net assimilation rate calculated using steady state equations
+default	GasEx	Esty	italic(E)[sty]	mmol m-2 s-1				GasEx	Esty								Transpiration rate calculated using steady state equations
+	Dynamic																Variables related to non-steady-state gas-exchange calculations
+default	Dynamic	Adyn	italic(A)[dyn]	µmol m-2 s-1				Dynamic	Adyn								Net assimilation rate, calculated for non-steady state conditions
+default	Dynamic	Crd	italic(C)[rd]	µmol mol-1				Dynamic	Crd			CO2buf					Non-steady state, dry-equivalent reference CO2
+default	Dynamic	Csd	italic(C)[sd]	µmol mol-1				Dynamic	Csd								Non-steady state, dry-equivalent sample CO2
+default	Dynamic	dCsd_dt	"d*italic(C)[sd]*""/""*d*italic(t)"	µmol mol-1 s-1				Dynamic	dCsd/dt								Rate of change of Csd
+default	Dynamic	alphaVc	alpha*italic(V)[c]	cm3				Dynamic	αVc								Effective CO2 Volume of the gas-exchange chamber
+default	Dynamic	Edyn	italic(E)[dyn]	mmol m-2 s-1				Dynamic	Edyn								Evapotranspiration calculated for non-steady state conditions
+default	Dynamic	Hr	italic(H)[r]	mmol mol-1				Dynamic	Hr								Non-steady state reference H2O
+default	Dynamic	Hs	italic(H)[s]	mmol mol-1				Dynamic	Hs								Non-steady state sample H2O
+default	Dynamic	dHs_dt	"d*italic(H)[s]*""/""*d*italic(t)"	mmol mol-1 s-1				Dynamic	dHs/dt								Rate of change of Hs
+default	Dynamic	alphaVh	alpha*italic(V)[h]	cm3				Dynamic	αVh								Effective H2O Volume
+	LeafQ																Variables related to light intensity in the chamber
+default	LeafQ	Qabs	"italic(Q)[""abs""]"	µmol m-2 s-1				LeafQ	Qabs								PPFD absorbed by the leaf
+default	LeafQ	Qin	"italic(Q)[""in""]"	µmol m-2 s-1		Qin	µmol m-2 s-1	LeafQ	Qin								PPFD incident on the leaf
+default	LeafQ	alpha	alpha	numeric		alpha		LeafQ	alpha	LeafAbs							PPFD absorptance
+default	LeafQ	Conv		J µmol-1				LeafQ	convert								Conversion from PPFD to Watts per square meter
+	Leak																Variables related to leak corrections
+default	Leak	Leak		µmol s-1				Leak	Leak								Leakage from chamber
+default	Leak	LeakPct		%				Leak	LeakPct								Leakage as percent of flow
+default	Leak	CorrFact		numeric	1			Leak	CorrFact								Leak correction factor
+default	Leak	CorrFactPct		%				Leak	CorrFactPct								Leak correction factor as percent
+default	Leak	Fan		µmol s-1				Leak	Fan								Estimated mixing fan flow
+	FLR																Variables related to chlorophyll fluorescence
+default	FLR	Fo	italic(F)[o]	numeric				FLR	Fo	Fo	numeric	Fo			Fo	numeric	Dark-adapted, minimal fluorescence
+default	FLR	Fm	italic(F)[m]	numeric				FLR	Fm	Fm	numeric	Fm			Fm	numeric	Dark-adapted maximal fluorescence
+default	FLR	Fv_Fm	"italic(F)[v]*""/""*italic(F)[m]"	numeric				FLR	Fv/Fm	Fv/Fm	numeric	Fv/Fm			FvFm	numeric	Maximum quantum efficiency of PSII photochemistry
+default	FLR	Adark		µmol m-2 s-1				FLR	A_dark	Adark	numeric						Dark assimilation rate before Fm
+default	FLR	Fs	italic(F)[s]	numeric				FLR	Fs	Fs	numeric	F			Fs	numeric	Steady state fluorescence
+default	FLR	Fmp	"italic(F)*""\U2032""[m]"	numeric				FLR	Fm'	Fm'	numeric	Fm'			FmP	numeric	Light-adapted maximal fluorescence
+default	FLR	phiPS2	Phi[PSII]	numeric				FLR	PhiPS2	PhiPS2	numeric	Yield			phiPSII	numeric	Operating quantum efficiency of Photosystem II in the light
+default	FLR	QabsFs	"italic(Q)[""abs,Fs""]"	µmol m-2 s-1				FLR	Qabs_fs								Light quanta absorbed at Fs
+default	FLR	AFs	italic(A)[Fs]	µmol m-2 s-1				FLR	A_fs								Net assimilation rate at Fs
+default	FLR	ETR	italic(J)[F]	µmol m-2 s-1				FLR	ETR	ETR	numeric	ETR			J	µmol m-2 s-1	Electron transport rate calculated from chlorophyll fluorescence
+default	FLR	phiCO2	"Phi[""CO2""]"	mol mol-1		PhiCO2a	mol mol-1	FLR	PhiCO2	PhiCO2	numeric						Quantum efficency of the carboxylation rate, based on absorbed irradiance
+default	FLR	NPQ		numeric				FLR	NPQ	NPQ	numeric	NPQ			NPQ	numeric	Non-photochemical quenching
+default	FLR	FopAlt	"italic(F)*""\U2032""[""o,alt""]"	numeric				FLR	alt. Fo'			Fo'calc					Alternative estimate for Fo' : Fo/(Fv/Fm+Fo/Fm')
+default	FLR	Fop	"italic(F)*""\U2032""[o]"	numeric				FLR	Fo'	Fo'	numeric	Fo'			FoP	numeric	Light-adapted minimal fluorescence
+default	FLR	Fvp_Fmp	"italic(F)*""\U2032""[v] *""/""* italic(F)*""\U2032""[m]"	numeric				FLR	Fv'/Fm'	Fv'/Fm'	numeric				FvFmP	numeric	Maximum quantum efficiency of PSII in the light, if all reaction-centres were open
+default	FLR	qP	italic(q)[P]	numeric				FLR	qP	qP	numeric	qP			qP	numeric	Photochemical quenching coefficient
+default	FLR	qPFo	"italic(q)[""P,Fo""]"	numeric				FLR	qP_Fo								Photochemical quenching coefficient, using Fo instead of Fo'
+default	FLR	qN	italic(q)[N]	numeric				FLR	qN	qN	numeric				qNP	numeric	Non-photochemical quenching coefficient
+default	FLR	qNFo	"italic(q)[""N,Fo""]"	numeric				FLR	qN_Fo								Non-photochemical quenching coefficient, using Fo instead of Fo'
+default	FLR	qL	italic(q)[L]	numeric				FLR	qL			qL			qL	numeric	An estimate for the fraction of open PSII centres
+default	FLR	QinFs	"italic(Q)[""in,Fs""]"	numeric						ParIn@Fs	numeric						Light intensity measured at Fs
+default	FLR	PhiQin_4	"Phi[PSII]*italic(Q)[""in""]*""/""*4"	µmol m-2 s-1													A convenience parameter for some analyses. PhiPS2 x Qin/4
+gm_fluorescence	FLR	gm	"italic(g)[""m,flr""]"	mol m-2 s-1 Pa-1													Mesophyll conductance derived from fluorescence
+gm_fluorescence	FLR	Cc	"italic(C)[""c,flr""]"	µmol mol-1													Chloroplast CO2 mole fraction derived from fluorescence
+	MPF																
+	FastKntcs																
+	FlrStats																Statistics related to chlorophyll fluorescence
+default	FlrStats	Favg	italic(F)[avg]	numeric				FlrStats	F_avg	Fmean	numeric						Average fluorescence
+default	FlrStats	dF_dt	"d*italic(F)*""/""*d*italic(t)"	min-1				FlrStats	dF/dt	dF/dt	numeric						Rate of change of the fluorescence
+default	FlrStats	Period		s				FlrStats	period								Period used for calculating statistics
+d13C	d13CConst	ab	italic(a)[b]	‰	2.9												13C fractionation associated with diffusion through air boundary layers
+d13C	d13CConst	as	italic(a)[s]	‰	4.4												13C fractionation associated with free diffusion through air
+d13C	d13CConst	am	italic(a)[m]	‰	1.8												13C fractionation associated with diffusion through liquid
+d13C	d13CConst	b	italic(b)	‰	30												13C fractionation associated with carboxylation
+d13C	d13CConst	e	italic(e)	‰	-3												13C fractionation associated with mitochondrial respiration
+d13C	d13CConst	f	italic(f)	‰	11.6												13C fractionation associated with photorespiration
+d13C	d13CConst	delta13CO2g	"delta^{13}*C*""-""*CO[""2,g""]"	‰	-8.5												Isotopic composition of CO2 in the air during growth conditions
+d13C	d13CConst	Deltag	Delta[o]^{growth}	‰													Observed discrimination against 13CO2, measured under ambient growth conditions
+d13C	d13CMeas	delta13CO2s	"delta^{13}*C*""-""*CO[""2,s""]"	‰													Isotopic composition of sample CO2
+d13C	d13CMeas	delta13CO2r	"delta^{13}*C*""-""*CO[""2,r""]"	‰													Isotopic composition of the reference CO2
+d13C	d13C	xi	xi	numeric													The inverse of the relative drawdown of dry-equivalent CO2 in the leaf chamber
+d13C	d13C	ap	"italic(a)*""\U2032"""	‰													Weighted 13C fractionation associated with air and boundary layers
+d13C	d13C	ep	"italic(e)*""\U2032"""	‰													Corrected fractionation associated with respiration
+d13C	d13C	t	italic(t)	numeric													A ternary correction factor
+d13C	d13C	Deltai	Delta[i]	‰													Model-predicted discrimination against 13CO2
+d13C	d13C	Deltao	Delta[o]	‰													Observed discrimination against 13CO2
+d13C	d13C	DeltaiDeltao	Delta[i]-Delta[o]	‰													Difference between predicted and observed discrimination against 13CO2
+d13C	d13C	A_pCa	"italic(A)*""/""*italic(p)[C[a]]"	µmol m-2 s-1 Pa-1													Ratio between net assimilation and the partial pressure of CO2 in the ambient air
+d13C	d13C	gm	"italic(g)[m*"",""^{13}*C]"	mol m-2 s-1 Pa-1													Mesophyll conductance derived from carbon isotope discrimination
+d13C	d13C	Cc	"italic(C)[c*"",""^{13}*C]"	µmol mol-1													Chloroplast CO2 derived from carbon isotope discrimination
+	Meas																Measurement variables for gas-exchange calculations
+default	Meas	Time	Time	posix				Meas	TIME								Unix time stamp for the measurement
+default	Meas	Flow	Flow	µmol s-1		flow	µmol s-1	Meas	Flow	Flow	µmol s-1	Flow					Flow rate into the chamber
+default	Meas	Pa	italic(P)[a]	kPa	101.3	Patm	kPa	Meas	Pa	Press	kPa	Pamb	Pr	mbar	Patm	mbar	Atmospheric pressure
+default	Meas	DeltaPcham	Delta*P[cham]	kPa	0			Meas	ΔPcham								Chamber overpressure
+default	Meas	Tamb	italic(T)[amb]	°C								Tamb			Tamb	°C	Ambient temperature sensor
+default	Meas	Tair	italic(T)[air]	°C				Meas	Tair	Tair	°C	Tcuv			Tcuv	°C	Chamber air temperature
+default	Meas	Tleaf	italic(T)[leaf]	°C				Meas	Tleaf	Tleaf	°C	Tleaf			Tleaf	°C	Leaf thermocouple 1
+default	Meas	Tleaf2	italic(T)[leaf2]	°C				Meas	Tleaf2								Leaf thermocouple 2
+default	Meas	FanSpeed		numeric	0			Meas	Fan_speed			Imp					Chamber fan speed
+default	Meas	QambIn	"italic(Q)[""amb,in""]"	µmol m-2 s-1				Meas	Qamb_in	PARi	µmol m-2 s-1	PARtop			PARi	µmol m-2 s-1	In-chamber ambient PPFD
+default	Meas	QambInBot	"italic(Q)[""amb,in,bot""]"	µmol m-2 s-1								PARbot					In-chamber ambient PPFD from the bottom
+default	Meas	QambOut	"italic(Q)[""amb,out""]"	µmol m-2 s-1		Qout	µmol m-2 s-1	Meas	Qamb_out	PARo	µmol m-2 s-1	PARamb			PARe	µmol m-2 s-1	External ambient PPFD
+default	Meas	CO2s	"""[""*CO[2]*""]""[s]"	µmol mol-1		CO2s	µmol mol-1	Meas	CO2_s	CO2S	µmol mol-1	ca	CO2a	µmol mol-1	CO2a	µmol mol-1	CO2 mole fraction in wet air leaving the chamber
+default	Meas	CO2a	"""[""*CO[2]*""]""[a]"	µmol mol-1				Meas	CO2_a								CO2 mole fraction in wet air leaving the chamber, before match correction
+default	Meas	CO2r	"""[""*CO[2]*""]""[r]"	µmol mol-1		CO2r	µmol mol-1	Meas	CO2_r	CO2R	µmol mol-1	CO2abs	CO2r	µmol mol-1	CO2r	µmol mol-1	CO2 mole fraction in wet air entering the chamber
+default	Meas	H2Os	"""[""*H[2]*O*""]""[s]"	mmol mol-1		H2Os	µmol mol-1	Meas	H2O_s	H2OS	µmol mol-1	wa	H2Oa	mbar	H2Oa	mmol mol-1	H2O mole fraction in air leaving the chamber
+default	Meas	H2Oa	"""[""*H[2]*O*""]""[a]"	mmol mol-1				Meas	H2O_a								H2O mole fraction in air leaving the chamber, before match correction
+default	Meas	H2Or	"""[""*H[2]*O*""]""[r]"	mmol mol-1		H2Or	µmol mol-1	Meas	H2O_r	H2OR	µmol mol-1		H2Or	mbar	H2Or	mmol mol-1	H2O mole fraction in air entering the chamber
+default	Meas2	TdR	"italic(T)[""d,r""]"	°C				Meas2	Td_r	TdR	°C						Reference cell dew point
+default	Meas2	TdS	"italic(T)[""d,s""]"	°C				Meas2	Td_s	TdS	°C						Sample cell dew point
+	MchEvent																Variables related to the latest match
+default	MchEvent	Time		posix				MchEvent	time								Unix time stamp of the last match
+default	MchEvent	HHMMSS		character				MchEvent	hhmmss								Time of last match as character string
+default	MchEvent	CO2time		posix				MchEvent	co2_t								Unix time stamp of the last CO2 match
+default	MchEvent	H2Otime		posix				MchEvent	h2o_t								Unix time stamp of the last H2O match
+default	MchEvent	Count		integer				MchEvent	count								Match count number
+default	MchEvent	CO2adj		µmol mol-1				MchEvent	co2_adj								CO2r - CO2s at last point match
+default	MchEvent	H2Oadj		mmol mol-1				MchEvent	h2o_adj								H2Or - H2Os at last point match
+default	MchEvent	CO2pMatch		µmol mol-1				MchEvent	co2_match	CsMch							CO2r - CO2a at last point match
+default	MchEvent	H2OpMatch		mmol mol-1				MchEvent	h2o_match	HsMch							H2Or - H2Oa at last point match
+default	MchEvent	CO2at		µmol mol-1				MchEvent	co2_at	matchCO2							CO2 at last match
+default	MchEvent	H2Oat		mmol mol-1				MchEvent	h2o_at	matchH2O							H2O at last match
+	MchStatus																Values associated with the current match
+default	MchStatus	MatchCO2		µmol mol-1				MchStatus	MatchCO2								Currently used CO2 match adjustment value
+default	MchStatus	MatchH2O		mmol mol-1				MchStatus	MatchH2O								Currently used H2O match adjustment value
+default	MchStatus	CFaCO2		numeric				MchStatus	cf_co2_a								CO2 match coefficient
+default	MchStatus	CFbCO2		numeric				MchStatus	cf_co2_b								CO2 match coefficient
+default	MchStatus	CFcCO2		numeric				MchStatus	cf_co2_c								CO2 match coefficient
+default	MchStatus	CFdCO2		numeric				MchStatus	cf_co2_d								CO2 match coefficient
+default	MchStatus	CFaH2O		numeric				MchStatus	cf_h2o_a								H2O match coefficient
+default	MchStatus	CFbH2O		numeric				MchStatus	cf_h2o_b								H2O match coefficient
+default	MchStatus	CFcH2O		numeric				MchStatus	cf_h2o_c								H2O match coefficient
+default	MchStatus	CFdH2O		numeric				MchStatus	cf_h2o_d								H2O match coefficient
+default	MchStatus	CO2fitLow		µmol mol-1				MchStatus	co2_fit_low								CO2 range match fit lower limit
+default	MchStatus	CO2fitHigh		µmol mol-1				MchStatus	co2_fit_high								CO2 range match fit upper limit
+default	MchStatus	H2OfitLow		mmol mol-1				MchStatus	h2o_fit_low								H2O range match fit lower limit
+default	MchStatus	H2OfitHigh		mmol mol-1				MchStatus	h2o_fit_high								H2O range match fit upper limit
+default	MchStatus	Status		character													Free-text match status information
+	FlrLS																Variables associated with fluorometer light sources
+default	FlrLS	Q		µmol m-2 s-1				FlrLS	Q								Fluorometer photon flux density
+default	FlrLS	fred		1				FlrLS	f_red								Fraction red
+default	FlrLS	fgreen		1													Fraction green
+default	FlrLS	fblue		1				FlrLS	f_blue								Fraction blue
+default	FlrLS	fwhite		1													Fraction white
+default	FlrLS	ffarred		1				FlrLS	f_farred								Fraction far red
+default	FlrLS	F		numeric				FlrLS	F	F	numeric				F	numeric	Demodulated fluorescence
+default	FlrLS	Qmodavg		µmol m-2 s-1				FlrLS	Q_modavg								Modulated contribution to FlrLS.Q
+default	FlrLS	Qred		µmol m-2 s-1				FlrLS	Q_red								Red actinic contribution to FlrLS.Q
+default	FlrLS	Qblue		µmol m-2 s-1				FlrLS	Q_blue								Blue actinic contribution to FlrLS.Q
+default	FlrLS	Qfarred		µmol m-2 s-1				FlrLS	Q_farred								Far red contribution to FlrLS.Q
+default	FlrLS	State		numeric				FlrLS	state								Specifies flash type: 0=Normal, 1=Rect, 2=MPF, 3=Ind, 4=Dark
+default	FlrLS	Status		character											Status.1	character	Additional free text status information related to the fluorometer
+	HeadLS																Variables associated with the head light source
+default	HeadLS	Q		µmol m-2 s-1				HeadLS	Q								Head light source output
+default	HeadLS	fred		1				HeadLS	f_red						Red	%	Head light source, fraction red
+default	HeadLS	fgreen		1				HeadLS	f_green						Green	%	Head light source, fraction green
+default	HeadLS	fblue		1				HeadLS	f_blue						Blue	%	Head light source, fraction blue
+default	HeadLS	fwhite		1				HeadLS	f_white						White	%	Head light source, fraction white
+default	HeadLS	ffarred		1											FarRed	%	Head light source, fraction far red
+	ConsoleLS																Variables related to an external light source
+default	ConsoleLS	Q		µmol m-2 s-1				ConsoleLS	Q								Console light source intensity
+default	ConsoleLS	fred		1				ConsoleLS	f_red								Console light source, fraction of red light
+default	ConsoleLS	fgreen		1				ConsoleLS	f_green								Console light source,fraction of green light
+default	ConsoleLS	fblue		1				ConsoleLS	f_blue								Console light source, fraction of blue light
+default	ConsoleLS	fwhite		1				ConsoleLS	f_white								Console light source, fraction of white light
+	Stability																Content depends on what variables are being targeted for stability checking.
+default	Stability	Stable		integer				Stability	Stable	State	logical						Number of stable variables
+default	Stability	Total		integer				Stability	Total								Number of variables  tracked
+default	Stability	State		character				Stability	State								stable variables / total variables
+	Raw																Low-level instrument data.
+default	Raw	CO2aAbs		numeric				Raw	abs_c_a								CO2 absorptance sample cell
+default	Raw	CO2rAbs		numeric				Raw	abs_c_b								CO2 absorptance reference cell
+default	Raw	H2OaAbs		numeric				Raw	abs_h_a								H2O absorptance sample cell
+default	Raw	H2OrAbs		numeric				Raw	abs_h_b								H2O absorptance reference cell
+default	Raw	H2Oa		mmol mol-1													back-calculated H2O in mole fraction, sample cell
+default	Raw	H2Or		mmol mol-1								H2Oabs					back-calculated H2O in mole fraction, reference cell
+default	Raw	CO2aAbsP		kPa-1													back-calculated CO2 in absorptance per kPa, sample cell
+default	Raw	CO2rAbsP		kPa-1													back-calculated CO2 in absorptance per kPa, reference cell
+	Status																Information on the state of the instrument
+default	Status	FlowS		µmol s-1				Status	Flow_s								Sample cell flow
+default	Status	FlowR		µmol s-1				Status	Flow_r								Reference cell flow
+default	Status	Txchg	italic(T)[xchg]	°C				Status	Txchg	TBlk	°C						Heat exchanger temperature
+default	Status	Tirga	italic(T)[irga]	°C				Status	Tirga				Tirga	°C			IRGA block temperature
+default	Status	Ts		°C				Status	Ts								A cell inlet temperature
+default	Status	Tr		°C				Status	Tr								B cell inlet temperature
+default	Status	Status		character						Status	character	Status	Status	character	Status	character	Free text status information
+	LeakConst																Constants associated with leak corrections
+default	LeakConst	FsMeas		character				LeakConst	Fs_meas								Character string with measured FlowS adjustement
+default	LeakConst	FsTrue		character				LeakConst	Fs_true								Character string with true FlowS adjustment
+default	LeakConst	CFaFan		numeric				LeakConst	fan_a								Fan flow calibration coefficient
+default	LeakConst	CFbFan		numeric				LeakConst	fan_b								Fan flow calibration coefficient
+default	LeakConst	CFcFan		numeric				LeakConst	fan_c								Fan flow calibration coefficient
+default	LeakConst	CFdFan		numeric				LeakConst	fan_d								Fan flow calibration coefficient
+default	LeakConst	LeakWt		numeric	0			LeakConst	leak_wt								Leak weighting factor
+	ChambConst																Chamber specific constants
+default	ChambConst	Aperture		cm2				ChambConst	Aperture								Aperture used for the chamber
+default	ChambConst	PoBLC		kPa				ChambConst	blc_Po								Pressure for calculation of GasEx.gbw
+default	ChambConst	CFaBLC		numeric				ChambConst	blc_a								LI6800 specific coefficient for GasEx.gbw
+default	ChambConst	CFbBLC		numeric				ChambConst	blc_b								LI6800 specific coefficient for GasEx.gbw
+default	ChambConst	CFcBLC		numeric				ChambConst	blc_c								LI6800 specific coefficient for GasEx.gbw
+default	ChambConst	CFdBLC		numeric				ChambConst	blc_d								LI6800 specific coefficient for GasEx.gbw
+default	ChambConst	CFeBLC		numeric				ChambConst	blc_e								LI6800 specific coefficient for GasEx.gbw
+default	ChambConst	SmaxBLC		cm2				ChambConst	blc_maxS								LI6800 specific max. area for GasEx.gbw calculation
+default	ChambConst	SminBLC		cm2				ChambConst	blc_minS								LI6800 specific min. area for GasEx.gbw calculation
+default	ChambConst	SslopeBLC		numeric				ChambConst	blc_S_slope	BLCslope	numeric						LI6400 specific coefficient for GasEx.gbw
+default	ChambConst	SoffsetBLC		numeric				ChambConst	blc_S_offset	BLCoffst	numeric						LI6400 specific coefficient for GasEx.gbw
+	LTConst																Constants associated with temperature measurements
+default	LTConst	DeltaTw	Delta*italic(T)[w]	K	0			LTConst	deltaTw								Wall-air temp difference
+default	LTConst	fT1		1	1			LTConst	fT1								Fraction of TleafCnd measured by Tleaf
+default	LTConst	fT2		1	0			LTConst	fT2								Fraction of TleafCnd measured by Tleaf2
+default	LTConst	fTEB		1	0			LTConst	fTeb	EBal?	logical						Fraction of TleafCnd measured by TleafEB
+default	QConst	fQambIn		1	0			QConst	fQ_Amb_in								Fraction of PPFD coming from in-chamber ambient light
+default	QConst	fQambOut		1	0			QConst	fQ_Amb_out								Fraction of PPFD coming from external ambient light
+default	QConst	fQconsoleLS		1	0			QConst	fQ_ConsoleLS								Fraction of PPFD coming from a console light source
+default	QConst	fQflr		1	0			QConst	fQ_Flr								Fraction of PPFD coming from the fluorometer
+default	QConst	fQheadLS		1	0			QConst	fQ_HeadLS								Fraction of PPFD coming from the head light source
+default	QConst	fQin		1	1					f_parin	numeric						Fraction of Meas.QambIn used for energy-balance calculations
+default	QConst	fQout		1	0					f_parout	numeric						Fraction of Meas.QambOut used for energy-balance calculations
+	LQConst																Constants related to LeafQ computations
+default	LQConst	Ambient		character				LQConst	Ambient								Ambient light identifier
+default	LQConst	Leaf		character				LQConst	Leaf								Leaf type identifier
+default	LQConst	AbsAmbient	alpha[ambient]	numeric	0.8			LQConst	abs_ambient			ETR-Fac					Leaf absorptance for ambient
+default	LQConst	BlueAbsFlr		numeric				LQConst	abs_blueFlr	BlueAbs	numeric						Leaf absorptance for blueFlr
+default	LQConst	BlueAbsLED		numeric				LQConst	abs_blueLED								Leaf absorptance for blueLED
+default	LQConst	GreenAbsLED		numeric				LQConst	abs_greenLED								Leaf absorptance for greenLED
+default	LQConst	RedAbsFlr		numeric				LQConst	abs_redFlr	RedAbs	numeric						Leaf absorptance for redFlr
+default	LQConst	RedAbsLED		numeric				LQConst	abs_redLED								Leaf absorptance for redLED
+default	LQConst	WhiteAbsLED		numeric				LQConst	abs_whiteLED								Leaf absorptance for whiteLED
+default	LQConst	ConvAmbient		J µmol-1				LQConst	k_ambient	alphaK	numeric						Converts Qin to Rabs for ambient
+default	LQConst	BlueConvFlr		J µmol-1				LQConst	k_blueFlr								Converts Qin to Rabs for blueFlr
+default	LQConst	BlueConvLED		J µmol-1				LQConst	k_blueLED								Converts Qin to Rabs for blueLED
+default	LQConst	GreenConvLED		J µmol-1				LQConst	k_greenLED								Converts Qin to Rabs for greenLED
+default	LQConst	RedConvFlr		J µmol-1				LQConst	k_redFlr								Converts Qin to Rabs for redFlr
+default	LQConst	RedConvLED		J µmol-1				LQConst	k_redLED								Converts Qin to Rabs for redLED
+default	LQConst	WhiteConvLED		J µmol-1				LQConst	k_whiteLED								Converts Qin to Rabs for whiteLED
+	Auxilarry																Settings and measurements associated with auxilarry I/O
+default	Auxilarry	IO1		V				Auxilarry	I/O1			Aux1	AN1	V			Auxillary analog IO
+default	Auxilarry	IO2		V				Auxilarry	I/O2			Aux2	AN2	V			Auxillary analog IO
+default	Auxilarry	IO3		V				Auxilarry	I/O3								Auxillary analog IO
+default	Auxilarry	IO4		V				Auxilarry	I/O4								Auxillary analog IO
+default	Auxilarry	IO5		V				Auxilarry	I/O5								Auxillary analog IO
+default	Auxilarry	IO6		V				Auxilarry	I/O6								Auxillary analog IO
+default	Auxilarry	IO7		V				Auxilarry	I/O7								Auxillary analog IO
+default	Auxilarry	IO8		V				Auxilarry	I/O8								Auxillary analog IO
+	UserDefCon																User-defined constants
+	UserDefVar																User-defined variables
+default	UserDefVar	Object		integer								Object					User-defined object number
+default	UserDefVar	Comment		character								Comment			Comment	character	User-defined free-text comment
+	Li6400																Li6400 specific data
+	GFS3000																GFS-3000 specific data
+	CIRAS3																CIRAS-3 specific data
+	CIRAS4																CIRAS-4 specific data
+default	gasanalyzer																Information for the R package gasexchangeR
+default	gasanalyzer	UseEqUnits		logical	FALSE												Specifies whether or not the latest calculations enforced units
+default	gasanalyzer	Equations		list													A list of gas-exchange equations
+default	gasanalyzer	Version		character													Version number of gasanalyzer used to generate this list

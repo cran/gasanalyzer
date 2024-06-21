@@ -235,7 +235,7 @@ rename_header <- function(x, nm) {
 #' @export
 #'
 #' @examples
-#' example <- system.file("extdata//6400-testfile", package = "gasanalyzer")
+#' example <- system.file("extdata", "6400-testfile", package = "gasanalyzer")
 #'
 #' # read data:
 #' li6400 <- read_6400_txt(example)

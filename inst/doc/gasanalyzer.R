@@ -40,10 +40,10 @@ txtfile <- read_6800_txt(paste(exampleFiles, "lowo2", sep = "/"))
 
 ## -----------------------------------------------------------------------------
 # exclude list columns with equations, and divisions by zero
-excludeCols <- sapply(xlsxfile, 
+excludeCols <- vapply(xlsxfile, 
                       FUN=\(x) is.list(x) || 
                         all(is.infinite(x)) ||
-                        all(is.nan(x)))
+                        all(is.nan(x)), TRUE)
 
 # Interestingly, Leak.Fan reported in the txt file differs slightly
 # from that in the xlsx. It is likely caused by rounding/averaging in the
@@ -61,7 +61,7 @@ nice_labels <- function(plt) {
 }
 
 #generate some descriptive stats  and plotmath it with a call to var2label:
-descr <- colMeans(xlsxfile[c("LeafQ.Qin", "Meas.Tleaf", "SysConst.Oxygen")])
+descr <- colMeans(xlsxfile[c("LeafQ.Qin", "Meas.Tleaf", "Const.Oxygen")])
 dlist <- var2label(rep(names(descr), 2),
                    use_units = rep(c(FALSE, TRUE), each = 3),
                    val = c(rep(NA, 3), as.character(descr)),
@@ -113,7 +113,7 @@ xlsxEqs <- xlsxfile$gasanalyzer.Equations[[1]]
 print(xlsxEqs$LeafQ.alpha)
 
 # add our custom alpha by dividing it through the used beta:
-xlsxfile$Custom.alpha <- alphabeta / xlsxfile$FLR.fPS2
+xlsxfile$Custom.alpha <- alphabeta / xlsxfile$Const.fPS2
 # and change the equation to use the new value:
 xlsxEqs <- modify_equations(xlsxEqs, LeafQ.alpha = \() {Custom.alpha})
 
@@ -143,7 +143,7 @@ create_equations("gm_fluorescence", FLR.rm = \(x) {1 / FLR.gm})
 
 ## -----------------------------------------------------------------------------
 xlsxfile21 <- xlsxfileRecal |> 
-  transform(SysConst.Oxygen = set_units(21, "%")) |>
+  transform(Const.Oxygen = set_units(21, "%")) |>
   recalculate(RecalEqs)
 
 ## ----plot3, fig.height = 3, fig.width = 6, eval = NOT_CRAN, purl = NOT_CRAN----
@@ -153,7 +153,7 @@ AvsCi21 <- xlsxfile21 |> ggplot() +
                  xlsxfileRecal$GasEx.A, shape = "1% O2")) +
   scale_shape_manual(name = "Calculated at:",
                      values = c("1% O2" = 1, "21% O2" = 2)) +
-  theme(legend.position = "inside", legend.position.inside = c(0.75, 0.25))
+  theme(legend.position = "inside", legend.position.inside = c(0.7, 0.3))
 
 AvsPhiQin21 <-
   xlsxfile21 |>
@@ -197,11 +197,11 @@ all.equal(ACi$GasEx.Ci, ACi2$GasEx.Ci)
 ## -----------------------------------------------------------------------------
 # we define some constants that specify the relative value of the variables
 # on which we will do a sensitivity analysis:
-SAset <- c("Const.calk", "Const.calg", "Const.calh", "Const.calc",
-           "Const.calt")
+SAset <- c("Const.calk", "Const.calg", "Const.calrhi", "Const.calt",
+           "Const.calh")
 # symbols for the plot header:
-SAlabs <- c("italic(K)", "italic(g)[cw]", "'['*H[2]*O*']'[r]", 
-            "'['*CO[2]*']'[r]", "italic(T)[leaf]")
+SAlabs <- c("italic(K)", "italic(g)[cw]", "RH[i]", 
+            "italic(T)[leaf]", "'['*H[2]*O*']'[r]")
 # set defaults to 1 (100%) and define sequences over which to permutate
 ACi[SAset] <- 1
 # a 5% range:
@@ -214,19 +214,19 @@ MSFeqs <- create_equations(c("default", "gfs3000", "cuticular_conductance"),
                            Meas.Tleaf = function() { Const.calt * Meas.Tleaf },
                            Const.gcw = function() { Const.calg * Const.gcw },
                            Const.gcc = function() { Const.gcw / 20 },
-                           Meas.CO2r = function() { Const.calc * Meas.CO2r },
-                           Meas.CO2s = function() { Const.calc * Meas.CO2s },
+                           Const.RHi = function() { Const.calrhi * Const.RHi },
                            Meas.H2Or = function() { Const.calh * Meas.H2Or },
                            Meas.H2Os = function() { Const.calh * Meas.H2Os })
 
 # set gcw and use steady-state equations, then use the sequences
-ACi[["Const.gcw"]] <- set_units(30, "mmol*m^-2*s^-1")
-ACi[["Const.UseDynamic"]] <- FALSE
+ACi[["Const.gcw"]] <- set_units(25, "mmol*m^-2*s^-1")
+ACi[["Const.RHi"]] <- set_units(95, "%")
+ACi[["SysConst.UseDynamic"]] <- FALSE
 
 ACi.SA <- rbind(permutate(ACi, Const.calk = c(1, 1 + 20 * seq5)),
               permutate(ACi, Const.calg = 1 + 20 * seq5),
+              permutate(ACi, Const.calrhi = 1 + seq5),
               permutate(ACi, Const.calt = 1 + seq5),
-              permutate(ACi, Const.calc = 1 + seq5),
               permutate(ACi, Const.calh = 1 + seq5)) |>
   recalculate(MSFeqs)
 
@@ -240,7 +240,7 @@ fitaci_per_group <- function(df, aPars, g1, ...) {
   outCols <- c(grp, aPars, "group", "Plots")
   splitOn <- paste("~", paste(grp, collapse = " + "))
   # drop category name and Filename for shorter labels:
-  lbls <- sapply(strsplit(grp, ".", fixed = TRUE), \(x) rev(x)[1]) |>
+  lbls <- vapply(strsplit(grp, ".", fixed = TRUE), \(x) rev(x), c("nm","gp")) |>
     paste0(": ") |>
     gsub("Filename: ", "", x = _, fixed = TRUE) 
   # layout:
@@ -284,7 +284,7 @@ CO2curves.SA$gval <- 100 * (as.numeric(CO2curves.SA$gval) - 1)
 
 # calc mean over the 3 reps:
 CO2curves.SAm <- 
-  sapply(names(CO2curves.SA[aPars]),
+  lapply(names(CO2curves.SA[aPars]),
          \(x) {
            # relative change:
            rval <- 100 * as.numeric((CO2curves.SA[[x]] - 
@@ -297,14 +297,13 @@ CO2curves.SAm <-
                            aggregate(cbind(gval), byl, head, n = 1),
                            group = aggregate(group, byl, head, n = 1)[["x"]],
                            val = aggregate(rval, byl, mean)[["x"]],
-                           sd = aggregate(rval, byl, sd)[["x"]]))},
-         simplify = FALSE) |>
+                           sd = aggregate(rval, byl, sd)[["x"]]))}) |>
   do.call(rbind, args = _)
 
 ## ----fig.height = 2.5, fig.width = 7, warning = FALSE, eval = NOT_CRAN, purl = NOT_CRAN----
 grid.arrange(grobs = CO2curves.SA$Plots[refids], ncol = 3)
 
-## ----eval=NOT_CRAN, fig.height=5, fig.width=7, purl=NOT_CRAN------------------
+## ----eval=NOT_CRAN, fig.height = 4.5, fig.width = 7, purl=NOT_CRAN------------
 # make lbls factors for good order and plotmath
 CO2curves.SAm$group <- factor(CO2curves.SAm$group,
                               levels = SAset,
@@ -331,7 +330,7 @@ CO2curves.SAm |>
 
 ## ----d13Crecalc---------------------------------------------------------------
 # load data
-isoFile <- paste(exampleFiles, "d13C.tsv", sep = "//")
+isoFile <- file.path(exampleFiles, "d13C.tsv")
 # read and recalculate
 isotopes <- read_gasexchange(isoFile) |>
   recalculate(create_equations(c("default", "li6400")))
@@ -420,12 +419,12 @@ units(gmEst$d13C.gm) <- deparse_unit(isotopes$d13C.gm)
 units(gmEst$d13C.gm.sem) <- deparse_unit(isotopes$d13C.gm)
 
 
-## ----fsens, fig.height=4, fig.width=5.5, eval = NOT_CRAN, purl = NOT_CRAN-----
+## ----fsens, fig.height = 4, fig.width = 7, eval = NOT_CRAN, purl = NOT_CRAN----
 
 fsens <- ggplot(gmEst, aes(d13CConst.f, d13C.gm, 
                            ymin = d13C.gm - d13C.gm.sem,
                            ymax = d13C.gm + d13C.gm.sem, 
-                           shape = method, color=Model)) + 
+                           shape = method, color = Model)) + 
   geom_point(color = "black") +
   geom_ribbon(alpha = 0.1, color = NA) + guides(color = "none") +
   scale_shape_manual("Method:", values = c(1, 2)) + facet_wrap(vars(Model)) +

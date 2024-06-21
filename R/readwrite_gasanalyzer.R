@@ -21,7 +21,7 @@
 #' @export
 #' @examples
 #' \dontshow{.old_wd <- setwd(tempdir())}
-#' example <- system.file("extdata//d13C.tsv", package = "gasanalyzer")
+#' example <- system.file("extdata", "d13C.tsv", package = "gasanalyzer")
 #'
 #' # read data and recalculate using default gas-exchange equations:
 #' df <- read_gasexchange(example) |>
@@ -97,7 +97,7 @@ write_gasexchange <- function(df, filename, delim = "\t") {
 #' @export
 #' @examples
 #'
-#' example <- system.file("extdata//d13C.tsv", package = "gasanalyzer")
+#' example <- system.file("extdata", "d13C.tsv", package = "gasanalyzer")
 #'
 #' # read data
 #' read_gasexchange(example)
@@ -190,7 +190,7 @@ read_gasexchange <- function(filename, delim = "\t") {
 #'
 #' @export
 #' @examples
-#' example <- system.file("extdata//d13C.tsv", package = "gasanalyzer")
+#' example <- system.file("extdata", "d13C.tsv", package = "gasanalyzer")
 #'
 #' # read data and recalculate using default gas-exchange equations:
 #' df <- read_gasexchange(example) |>

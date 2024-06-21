@@ -33,7 +33,7 @@
 #'
 #' @export
 #' @examples
-#' example <- system.file("extdata//aci1.csv", package = "gasanalyzer")
+#' example <- system.file("extdata", "aci1.csv", package = "gasanalyzer")
 #'
 #' # Read using GFS-3000 names and formatting:
 #' gfs3000_old <- read_gfs(example, unified_names = FALSE)
@@ -133,7 +133,7 @@ read_gfs <- function(filename, tz = Sys.timezone(), unified_names = TRUE,
     # to match measurements to which it belongs
     zptrue <- grepl("ZP", splitcode[ , 1], fixed = TRUE)
     na_vec <- rep(NA, length(zptrue))
-    o2fac <- gfs_o2_factor(df[["Raw.H2Or"]], df[["SysConst.Oxygen"]])
+    o2fac <- gfs_o2_factor(df[["Raw.H2Or"]], df[["Const.Oxygen"]])
 
     df["SysObs.Averaging"] <- set_units(as.numeric(splitcode[ , 2]), "s")
       # why do none of the instruments save a timezone?
@@ -189,7 +189,7 @@ read_gfs <- function(filename, tz = Sys.timezone(), unified_names = TRUE,
 
    #Walz version of "Dynamic"
    if (all("GFS3000.H2Obuf" %in% names(df))) {
-     df["Const.UseDynamic"] <- TRUE
+     df["SysConst.UseDynamic"] <- TRUE
      df["Dynamic.Hr"] <- o2fac * g0("GFS3000.H2Obuf", NA_real_,
                                     envir = list2env(df))
 
@@ -205,7 +205,7 @@ read_gfs <- function(filename, tz = Sys.timezone(), unified_names = TRUE,
       }
       df["GFS3000.H2Obuf"] <- NULL
     } else
-      df["Const.UseDynamic"] <- FALSE
+      df["SysConst.UseDynamic"] <- FALSE
 
     df[c("GFS3000.dCO2ZP", "GFS3000.dH2OZP", "GFS3000.Code", "GFS3000.dCO2MP",
          "GFS3000.dH2OMP")] <- NULL

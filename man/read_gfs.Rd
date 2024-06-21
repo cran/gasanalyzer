@@ -43,7 +43,7 @@ Multiple files can be loaded by calling the function with \code{\link[=lapply]{l
 to ensure that the column names will match.
 }
 \examples{
-example <- system.file("extdata//aci1.csv", package = "gasanalyzer")
+example <- system.file("extdata", "aci1.csv", package = "gasanalyzer")
 
 # Read using GFS-3000 names and formatting:
 gfs3000_old <- read_gfs(example, unified_names = FALSE)

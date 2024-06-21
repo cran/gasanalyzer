@@ -31,7 +31,7 @@ data with other software packages.
 }
 \examples{
 \dontshow{.old_wd <- setwd(tempdir())}
-example <- system.file("extdata//d13C.tsv", package = "gasanalyzer")
+example <- system.file("extdata", "d13C.tsv", package = "gasanalyzer")
 
 # read data and recalculate using default gas-exchange equations:
 df <- read_gasexchange(example) |>

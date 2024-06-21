@@ -18,7 +18,7 @@
 #' @returns A tibble with gas-exchange data in columns.
 #'
 #' @importFrom stringi stri_replace_all_fixed stri_replace_all_regex
-#'   stri_split_fixed stri_detect_regex
+#'   stri_split_fixed stri_detect_regex stri_startswith_fixed
 #' @importFrom tibble tibble as_tibble
 #' @importFrom units set_units units_options
 #' @importFrom xml2 read_html as_list
@@ -29,7 +29,7 @@
 #' @export
 #'
 #' @examples
-#' example <- system.file("extdata//6400-testfile", package = "gasanalyzer")
+#' example <- system.file("extdata", "6400-testfile", package = "gasanalyzer")
 #'
 #' # read data
 #' li6400data <- read_6400_txt(example)
@@ -51,37 +51,45 @@ read_6400_txt <- function(filename, tz = Sys.timezone()) {
   rfl <- length(rawfile)
   data_start <- which(rawfile[1:min(rfl, 1000)] == "$STARTOFDATA$")
   if (length(data_start) == 0L) {
-    warning("No STARTOFDATA section in first 1000 lines, ignoring ",
-            filename, ". Report a bug if this file is a valid OPEN file.\n")
-    return(tibble())
+    #useful for csv converted xls:
+    data_start <- which(stri_startswith_fixed(rawfile[1:min(rfl, 1000)],
+                                              "\"Obs\""))
+    if (length(data_start) == 0L) {
+      warning("No STARTOFDATA section in first 1000 lines, ignoring ",
+              filename, ". Report a bug if this file is a valid OPEN file.\n")
+      return(tibble())
+    }
   }
 
-  tryCatch({
-    # failing to read metadata might still allow reading data...
-    # TODO: using cal data
-    metadata <- read_html(paste0(rawfile[3:data_start - 2],
-                                 collapse = "")) |> as_list()
+  htmlblock <- paste0(rawfile[3:(data_start - 2)], collapse = "")
 
-    open_vers <- metadata[["html"]][["body"]][["p"]][["open"]][["version"]][[1]]
-    open_vers <- gsub("\"", "", open_vers, fixed = TRUE)
+  if (grepl("<open>", htmlblock)) {
+    tryCatch({
+      # failing to read metadata might still allow reading data...
+      # TODO: using cal data
+      metadata <- read_html(htmlblock) |> as_list()
 
-    if (length(open_vers) == 0 ||
-        is.na(numeric_version(open_vers, strict = FALSE)) ||
-        compareVersion(open_vers, "6.2.0") < 0)
-      warning(filename,
-              " was created by an untested firmware version (v",
-              open_vers, ").\n")
-  },
-  error = function(cond) {
-    message("Failed to read metadata from ", filename, ":")
-    message(cond)
-    metadata <- NA
-  })
+      open_vers <- metadata[["html"]][["body"]][["open"]][["version"]][[1]]
+      open_vers <- gsub("\"", "", open_vers, fixed = TRUE)
+
+      if (length(open_vers) == 0 ||
+          is.na(numeric_version(open_vers, strict = FALSE)) ||
+          compareVersion(open_vers, "6.2.0") < 0)
+        warning(filename,
+                " was created by an untested firmware version (v",
+                open_vers, ").\n")
+    },
+    error = function(cond) {
+      message("Failed to read metadata from ", filename, ":")
+      message(cond)
+      metadata <- NA
+    })
+  }
 
   # lack of tz info is cumbersome
   filedate <- rawfile[2] |>
-    gsub("\"","",x = _) |>
-    gsub("Thr","Thu", x = _) |>
+    gsub("\"", "",x = _) |>
+    gsub("Thr", "Thu", x = _) |>
     as.POSIXct(tz = tz, format="%a %b %d %Y %H:%M:%S")
 
   rawdata <- rawfile[(data_start + 1):rfl]

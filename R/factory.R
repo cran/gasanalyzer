@@ -146,7 +146,7 @@ import_factory_cals <- function(folder = tools::R_user_dir("gasanalyzer",
 #'
 #' @export
 #' @examples
-#' exampledir <- system.file("extdata//", package = "gasanalyzer")
+#' exampledir <- system.file("extdata", package = "gasanalyzer")
 #'
 #' # import factory cals for example data:
 #' import_factory_cals(exampledir)

@@ -30,7 +30,7 @@ change in the column of interest. If the effect of changes in multiple
 columns is to be analyzed, this function can be called in series.
 }
 \examples{
-example <- system.file("extdata//6400-testfile", package = "gasanalyzer")
+example <- system.file("extdata", "6400-testfile", package = "gasanalyzer")
 
 # read data:
 li6400 <- read_6400_txt(example)

@@ -40,7 +40,7 @@ filename, before the file extension). If no filename is provided, the
 converted data is returned.
 }
 \examples{
-example <- system.file("extdata//d13C.tsv", package = "gasanalyzer")
+example <- system.file("extdata", "d13C.tsv", package = "gasanalyzer")
 
 # read data and recalculate using default gas-exchange equations:
 df <- read_gasexchange(example) |>

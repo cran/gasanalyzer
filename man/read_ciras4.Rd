@@ -24,7 +24,7 @@ Multiple files can be loaded by calling the function with \code{\link[=lapply]{l
 to ensure that the column names will match.
 }
 \examples{
-example <- system.file("extdata//ciras4.csv", package = "gasanalyzer")
+example <- system.file("extdata", "ciras4.csv", package = "gasanalyzer")
 
 # Read using unified column names:
 cir4 <- read_ciras4(example)

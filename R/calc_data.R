@@ -35,7 +35,7 @@ calcs <- function() {
         desc = "",
         deps = "",
         fn = function() {
-          g0(Leak.Fan, NA, '\U00B5mol*s^-1')
+          g0(Leak.Fan, NA_real_, "\U00B5mol*s^-1")
         }
       ),
       li6800 = list(
@@ -50,7 +50,7 @@ calcs <- function() {
                                           Meas.FanSpeed@rpm@.) *
               Meas.Pa@"kPa"@. / Meas.Tair@"K"@. *
               LeakConst.CFdFan
-          )@'\U00B5mol*s^-1'
+          )@"\U00B5mol*s^-1"
         }
       )
     ),
@@ -75,7 +75,7 @@ calcs <- function() {
         desc = "",
         deps = "",
         fn = function() {
-          (Leak.CorrFact - 1) * 100@'%'
+          (Leak.CorrFact - 1) * 100@"%"
         }
       )
     ),
@@ -91,24 +91,24 @@ calcs <- function() {
         desc = "Li6800 specific version.",
         deps = "",
         fn = function() {
-          QConst.fQambIn * g0(Meas.QambIn, 0, '\U00B5mol*m^-2*s^-1') +
-            QConst.fQambOut * g0(Meas.QambOut, 0, '\U00B5mol*m^-2*s^-1') +
-            QConst.fQflr * g0(FlrLS.Q, 0, '\U00B5mol*m^-2*s^-1') *
+          QConst.fQambIn * g0(Meas.QambIn, 0, "\U00B5mol*m^-2*s^-1") +
+            QConst.fQambOut * g0(Meas.QambOut, 0, "\U00B5mol*m^-2*s^-1") +
+            QConst.fQflr * g0(FlrLS.Q, 0, "\U00B5mol*m^-2*s^-1") *
               (1@"1" - g0(FlrLS.ffarred, 0, "1")) +
-            QConst.fQheadLS * g0(HeadLS.Q, 0, '\U00B5mol*m^-2*s^-1') +
+            QConst.fQheadLS * g0(HeadLS.Q, 0, "\U00B5mol*m^-2*s^-1") +
             QConst.fQconsoleLS *
-              g0(ConsoleLS.Q, 0, '\U00B5mol*m^-2*s^-1')
+              g0(ConsoleLS.Q, 0, "\U00B5mol*m^-2*s^-1")
         }
       ),
       gfs3000 = list(
         desc = "GFS-3000 specific, for the top sensor.",
         deps = "",
-        fn = function() { Meas.QambIn@'\U00B5mol*m^-2*s^-1' }
+        fn = function() { Meas.QambIn@"\U00B5mol*m^-2*s^-1" }
       ),
       gfs3000.gfs3000_light_bot = list(
         desc = "GFS-3000 specific, for the bottom sensor.",
         deps = "",
-        fn = function() { Meas.QambInBot@'\U00B5mol*m^-2*s^-1' }
+        fn = function() { Meas.QambInBot@"\U00B5mol*m^-2*s^-1" }
       )
     ),
     LeafQ.alpha = list(
@@ -134,18 +134,18 @@ calcs <- function() {
         desc = "Li6400 specific, spectrum-weighted version.",
         deps = "",
         fn = function() {
-          (g0(FlrLS.fblue, NA, "1") * g0(LQConst.BlueAbsFlr, 0.85) +
-            (1@"1" - g0(FlrLS.fblue, NA, "1")) * g0(LQConst.RedAbsFlr, 0.85))@.
+          (g0(FlrLS.fblue, NA_real_, "1") * g0(LQConst.BlueAbsFlr, 0.85) +
+            (1@"1" - g0(FlrLS.fblue, NA_real_, "1")) * g0(LQConst.RedAbsFlr, 0.85))@.
         }
       ),
       li6800 = list(
         desc = "Li6800 specific, spectrum-weighted version.",
         deps = "",
         fn = function() {
-          un <- '\U00B5mol*m^-2*s^-1'
+          un <- "\U00B5mol*m^-2*s^-1"
           rb <- pmax(g0(FlrLS.Qred, 0, un) + g0(FlrLS.Qmodavg, 0, un) +
                        g0(FlrLS.Qblue, 0, un),
-                     set_units(0.1, un, mode = 'standard'))
+                     set_units(0.1, un, mode = "standard"))
           flr <- ((g0(FlrLS.Qred, 0, un) + g0(FlrLS.Qmodavg, 0, un)) /
                     rb * LQConst.RedAbsFlr + g0(FlrLS.Qblue, 0, un) /
                     rb * LQConst.BlueAbsFlr)@.
@@ -179,7 +179,7 @@ calcs <- function() {
                g0(QConst.fQflr) * g0(LQConst.RedConvFlr) +
                g0(QConst.fQheadLS) * g0(LQConst.RedConvLED)) /
             (g0(QConst.fQambIn) + g0(QConst.fQambOut) +
-               g0(QConst.fQflr) + g0(QConst.fQheadLS)))@'J*\U00B5mol^-1'
+               g0(QConst.fQflr) + g0(QConst.fQheadLS)))@"J*\U00B5mol^-1"
         }
       ),
       li6800 = list(
@@ -187,7 +187,7 @@ calcs <- function() {
         deps = "",
         fn = function() {
           #NB: not all permutations tested!
-          un <- '\U00B5mol*m^-2*s^-1'
+          un <- "\U00B5mol*m^-2*s^-1"
           rb <- pmax(g0(FlrLS.Qred, 0, un) + g0(FlrLS.Qmodavg, 0, un) +
                        g0(FlrLS.Qblue, 0, un), 0.1@un)
           am <- QConst.fQambIn * LQConst.ConvAmbient + QConst.fQambOut *
@@ -208,7 +208,7 @@ calcs <- function() {
                g0(ConsoleLS.fwhite) * LQConst.WhiteConvLED)
           ((am + flr + led + con) /
               (QConst.fQambIn + QConst.fQambOut + QConst.fQflr +
-                 QConst.fQheadLS + QConst.fQconsoleLS))@'J*\U00B5mol^-1'
+                 QConst.fQheadLS + QConst.fQconsoleLS))@"J*\U00B5mol^-1"
         }
       )
     ),
@@ -229,13 +229,13 @@ calcs <- function() {
             (Meas.Flow / Const.S * ((unity - Meas.H2Or) / unity) *
                (Dynamic.Crd - Dynamic.Csd - Meas.Pa * Dynamic.alphaVc *
                   Dynamic.dCsd_dt / (gasconstant * Meas.Tair@"K" *
-                                       Meas.Flow)))@'\U00B5mol*m^-2*s^-1'
+                                       Meas.Flow)))@"\U00B5mol*m^-2*s^-1"
           else if(exists("Dynamic.Hr")) #gfs doesn't always use CO2buf?
             ((g0(Dynamic.Crd, Meas.CO2r) - Meas.CO2s *
                (unity - Dynamic.Hr) / (unity - Meas.H2Os)) * Meas.Flow /
-               Const.S)@'\U00B5mol*m^-2*s^-1'
+               Const.S)@"\U00B5mol*m^-2*s^-1"
           else
-            NA_real_@'\U00B5mol*m^-2*s^-1'
+            NA_real_@"\U00B5mol*m^-2*s^-1"
           }
       )
     ),
@@ -249,12 +249,12 @@ calcs <- function() {
             (Meas.Flow / Const.S * (unity / (unity - Dynamic.Hs)) *
                (Dynamic.Hs - Dynamic.Hr + Meas.Pa * Dynamic.alphaVh *
                   Dynamic.dHs_dt / (gasconstant * Meas.Tair@"K" *
-                                      Meas.Flow)))@'mol*m^-2*s^-1'
+                                      Meas.Flow)))@"mol*m^-2*s^-1"
           else if(exists("Dynamic.Hr"))
             (Meas.Flow * (Meas.H2Os - Dynamic.Hr) /
-               (Const.S * (unity - Meas.H2Os)))@'mol*m^-2*s^-1'
+               (Const.S * (unity - Meas.H2Os)))@"mol*m^-2*s^-1"
           else
-            NA_real_@'mol*m^-2*s^-1'
+            NA_real_@"mol*m^-2*s^-1"
         }
       )
     ),
@@ -279,17 +279,17 @@ calcs <- function() {
         desc = "Li6800 specific version.",
         deps = "",
         fn = function() {
-          (ifelse(substr(Const.Geometry, 1, 1) == '0',
-                  { fpo <- (Meas.FanSpeed@'krpm' * Meas.Pa /
+          (ifelse(substr(SysConst.Geometry, 1, 1) == "0",
+                  { fpo <- (Meas.FanSpeed@"krpm" * Meas.Pa /
                     ChambConst.PoBLC)@.
                   mmS <- (pmax(pmin(Const.S, ChambConst.SmaxBLC),
-                              ChambConst.SminBLC))@'cm^2'@.
+                              ChambConst.SminBLC))@"cm^2"@.
                   ChambConst.CFaBLC + fpo * (ChambConst.CFbBLC +
                                               ChambConst.CFcBLC *
                                               mmS^2 + ChambConst.CFdBLC * mmS +
                                               ChambConst.CFeBLC * fpo)
-                  }, ifelse(substr(Const.Geometry, 1, 1) == '1', 3,
-                            as.numeric(Const.CustomBLC))))@'mol*m^-2*s^-1'
+                  }, ifelse(substr(SysConst.Geometry, 1, 1) == "1", 3,
+                            as.numeric(Const.CustomBLC))))@"mol*m^-2*s^-1"
         }
       ),
       gfs3000 = list(
@@ -302,10 +302,10 @@ calcs <- function() {
           # Area correction is WIP and not yet here (there are issues)
           # FIXME: depend on chamber type?
           imp <- pmax(1, Meas.FanSpeed@steps@.)
-          if (any(Const.S@'cm^2'@. != 8))
-            warning('\n  No area correction for gbw is ',
-                    'currently implemented.\n')
-          ((-52.2029 * imp^2 + 1161.15 * imp - 538.845) / 2000)@'mol*m^-2*s^-1'
+          if (any(Const.S@"cm^2"@. != 8))
+            warning("\n  No area correction for gbw is ",
+                    "currently implemented.\n")
+          ((-52.2029 * imp^2 + 1161.15 * imp - 538.845) / 2000)@"mol*m^-2*s^-1"
         }
       )
     ),
@@ -358,7 +358,7 @@ calcs <- function() {
           tc <- GasEx.TairCnd@.
           P <- (Meas.Pa + Meas.DeltaPcham)@"kPa"@"mbar"@.
           EF <- 1 + 1e-4 * (7.2 + P * (0.0320 + 5.9e-6 * tc^2))
-          (EF * (0.61121 * exp((18.678 - tc/234.5) * (tc/(257.14 + tc)))))@'kPa'
+          (EF * (0.61121 * exp((18.678 - tc/234.5) * (tc/(257.14 + tc)))))@"kPa"
         }
       )
     ),
@@ -366,7 +366,7 @@ calcs <- function() {
       default = list(
         desc = "",
         deps = "",
-        fn = function() { (LeafQ.Qin * LeafQ.Conv)@'W*m^-2' }
+        fn = function() { (LeafQ.Qin * LeafQ.Conv)@"W*m^-2" }
       ),
       li6400 = list(
         desc = paste0("Li6400 specific version that is corrected for",
@@ -374,14 +374,14 @@ calcs <- function() {
         deps = "",
         fn = function() { ((Meas.QambIn * QConst.fQin +
                               Meas.QambOut * QConst.fQout) *
-                             LeafQ.Conv)@'W*m^-2' }
+                             LeafQ.Conv)@"W*m^-2" }
       )
     ),
     GasEx.RHcham = list(
       default = list(
         desc = "",
         deps = "",
-        fn = function() { (GasEx.VPcham / GasEx.SVPcham)@'%' }
+        fn = function() { (GasEx.VPcham / GasEx.SVPcham)@"%" }
       )
     ),
     GasEx.Asty = list(
@@ -392,7 +392,7 @@ calcs <- function() {
           (Meas.Flow * Leak.CorrFact *
              (Meas.CO2r - Meas.CO2s * (unity - Leak.CorrFact * Meas.H2Or) /
                 (unity - Leak.CorrFact * Meas.H2Os)) /
-             Const.S)@'\U00B5mol*m^-2*s^-1'
+             Const.S)@"\U00B5mol*m^-2*s^-1"
         }
       )
     ),
@@ -402,7 +402,7 @@ calcs <- function() {
         deps = "",
         fn = function() {
           (Meas.Flow * Leak.CorrFact * (Meas.H2Os - Meas.H2Or) /
-             (Const.S * (unity - Leak.CorrFact * Meas.H2Os)))@'mmol*m^-2*s^-1'
+             (Const.S * (unity - Leak.CorrFact * Meas.H2Os)))@"mmol*m^-2*s^-1"
         }
       )
     ),
@@ -411,9 +411,9 @@ calcs <- function() {
         desc = "",
         deps = "",
         fn = function() {
-          ifelse(Const.UseDynamic@'mmol*m^-2*s^-1',
-                 Dynamic.Edyn@'mmol*m^-2*s^-1',
-                 GasEx.Esty@'mmol*m^-2*s^-1')
+          ifelse(SysConst.UseDynamic@"mmol*m^-2*s^-1",
+                 Dynamic.Edyn@"mmol*m^-2*s^-1",
+                 GasEx.Esty@"mmol*m^-2*s^-1")
         }
       )
     ),
@@ -421,7 +421,7 @@ calcs <- function() {
       default = list(
         desc = "",
         deps = "",
-        fn = function() { GasEx.Emm@'mol*m^-2*s^-1' }
+        fn = function() { GasEx.Emm@"mol*m^-2*s^-1" }
       )
     ),
     GasEx.A = list(
@@ -430,10 +430,10 @@ calcs <- function() {
         deps = "",
         fn = function() {
           #default to steady state for GFS:
-          ifelse(Const.UseDynamic &
+          ifelse(SysConst.UseDynamic &
                    SysObs.Instrument != "GFS3000",
-                 Dynamic.Adyn@'\U00B5mol*m^-2*s^-1',
-                 GasEx.Asty@'\U00B5mol*m^-2*s^-1')@'\U00B5mol*m^-2*s^-1'
+                 Dynamic.Adyn@"\U00B5mol*m^-2*s^-1",
+                 GasEx.Asty@"\U00B5mol*m^-2*s^-1")@"\U00B5mol*m^-2*s^-1"
         }
       )
     ),
@@ -441,16 +441,16 @@ calcs <- function() {
       default = list(
         desc = "",
         deps = "",
-        fn = function() { Meas.CO2s@'\U00B5mol*mol^-1' }
+        fn = function() { Meas.CO2s@"\U00B5mol*mol^-1" }
       ),
       li6800 = list(
         desc = "Li6800 specific version that includes a leak correction.",
         deps = "",
         fn = function() {
           # note 6800 firmware < 2.1.11 had a small bug
-          (Meas.CO2s - ifelse((Leak.CorrFact > 1)@'\U00B5mol*mol^-1',
-                              (GasEx.A * Const.S / Leak.Fan)@'\U00B5mol*mol^-1',
-                              0))@'\U00B5mol*mol^-1'
+          (Meas.CO2s - ifelse((Leak.CorrFact > 1)@"\U00B5mol*mol^-1",
+                              (GasEx.A * Const.S / Leak.Fan)@"\U00B5mol*mol^-1",
+                              0))@"\U00B5mol*mol^-1"
         }
       )
     ),
@@ -458,7 +458,7 @@ calcs <- function() {
       default = list(
         desc = "",
         deps = "",
-        fn = function() { (GasEx.Ca * (Meas.Pa + Meas.DeltaPcham))@'Pa' }
+        fn = function() { (GasEx.Ca * (Meas.Pa + Meas.DeltaPcham))@"Pa" }
       )
     ),
     GasEx.LatHFlux = list(
@@ -467,7 +467,7 @@ calcs <- function() {
         deps = "",
         fn = function() {
           # might define 44100 as a constant in future
-          44100@'W*s*mol^-1' * -GasEx.E
+          44100@"W*s*mol^-1" * -GasEx.E
         }
       )
     ),
@@ -477,8 +477,8 @@ calcs <- function() {
         deps = "",
         fn = function() {
           #29.3 and 0.92 may be variable, and could be settable constants?
-          (2 * 29.3@'J*mol^-1*K^-1' * GasEx.gbw * 0.92 *
-             (GasEx.TairCnd@'K' - GasEx.TleafCnd@'K'))@'W*m^-2'
+          (2 * 29.3@"J*mol^-1*K^-1" * GasEx.gbw * 0.92 *
+             (GasEx.TairCnd@"K" - GasEx.TleafCnd@"K"))@"W*m^-2"
         }
       )
     ),
@@ -487,9 +487,9 @@ calcs <- function() {
         desc = "",
         deps = "",
         fn = function() {
-          (2 * 0.95 * 5.67e-08@'W*K^-4*m^-2' *
-             ((Meas.Tair@'K' + LTConst.deltaTw)^4 -
-                (GasEx.TleafCnd@'K')^4))@'W*m^-2'
+          (2 * 0.95 * 5.67e-08@"W*K^-4*m^-2" *
+             ((Meas.Tair@"K" + LTConst.DeltaTw)^4 -
+                (GasEx.TleafCnd@"K")^4))@"W*m^-2"
         }
       )
     ),
@@ -507,12 +507,12 @@ calcs <- function() {
         desc = "",
         deps = "",
         fn = function() {
-          epssigma <-  0.95 * 5.67e-08@'W*K^-4*m^-2'
-          Ta <- GasEx.TairCnd@'K'
+          epssigma <-  0.95 * 5.67e-08@"W*K^-4*m^-2"
+          Ta <- GasEx.TairCnd@"K"
           # Tair (not TairCnd) for Tw!
-          Tw <- Meas.Tair@'K' + LTConst.deltaTw
+          Tw <- Meas.Tair@"K" + LTConst.DeltaTw
           (Ta + (GasEx.Rabs + 2 * epssigma * (Tw^4 - Ta^4) + GasEx.LatHFlux) /
-              (2 * 29.3@'J*mol^-1*K^-1' * 0.92 * GasEx.gbw +
+              (2 * 29.3@"J*mol^-1*K^-1" * 0.92 * GasEx.gbw +
                  8 * epssigma * Ta^3))@"degC"
         }
       )
@@ -530,7 +530,7 @@ calcs <- function() {
                       "if it is not touching the leaf in energy-balance mode."),
         deps = "",
         fn = function() { (ifelse(LTConst.fTEB@., Meas.Tleaf,
-                                  (Meas.Tleaf + Meas.Tair) / 2))@'degC' }
+                                  (Meas.Tleaf + Meas.Tair) / 2))@"degC" }
       )
     ),
     GasEx.TleafCnd = list(
@@ -538,9 +538,9 @@ calcs <- function() {
         desc = "",
         deps = "",
         fn = function() {
-          LTConst.fT1 * g0(Meas.Tleaf, -999.99, 'degC', TRUE) +
-            LTConst.fT2 * g0(Meas.Tleaf2, -999.99, 'degC', TRUE) +
-            LTConst.fTEB * g0(GasEx.TleafEB, -999.99, 'degC', TRUE)
+          LTConst.fT1 * g0(Meas.Tleaf, -999.99, "degC", TRUE) +
+            LTConst.fT2 * g0(Meas.Tleaf2, -999.99, "degC", TRUE) +
+            LTConst.fTEB * g0(GasEx.TleafEB, -999.99, "degC", TRUE)
         }
       )
     ),
@@ -571,9 +571,9 @@ calcs <- function() {
                       "inside the leaf chamber."),
         deps = "",
         fn = function() {
-          ((1.0007 + 3.46e-6 * (Meas.Pa + Meas.DeltaPcham)@'kPa'@'mbar'@.) *
+          ((1.0007 + 3.46e-6 * (Meas.Pa + Meas.DeltaPcham)@"kPa"@"mbar"@.) *
              0.61121 * exp(17.502 * GasEx.TleafCnd@. /
-                             (240.97 + GasEx.TleafCnd@.)))@'kPa'
+                             (240.97 + GasEx.TleafCnd@.)))@"kPa"
         }
       ),
       Buck1996 = list(
@@ -583,10 +583,10 @@ calcs <- function() {
         deps = "",
         fn = function() {
           tc <- GasEx.TleafCnd@.
-          P <- (Meas.Pa + Meas.DeltaPcham)@'kPa'@'mbar'@.
+          P <- (Meas.Pa + Meas.DeltaPcham)@"kPa"@"mbar"@.
           EF <- 1 + 1e-4 * (7.2 + P * (0.0320 + 5.9e-6 * tc^2))
           (EF * (0.61121 * exp((18.678 - tc / 234.5) *
-                                 (tc / (257.14 + tc)))))@'kPa'
+                                 (tc / (257.14 + tc)))))@"kPa"
         }
       )
     ),
@@ -595,7 +595,8 @@ calcs <- function() {
         desc = "",
         deps = "",
         fn = function() {
-          (GasEx.SVPleaf - Meas.H2Os * (Meas.Pa + Meas.DeltaPcham))@'kPa'
+          (GasEx.SVPleaf * g0(Const.RHi, 1, "1") -
+             Meas.H2Os * (Meas.Pa + Meas.DeltaPcham))@"kPa"
         }
       )
 
@@ -605,9 +606,10 @@ calcs <- function() {
         desc = "",
         deps = "",
         fn = function() {
-          wi <- GasEx.SVPleaf / (Meas.Pa + Meas.DeltaPcham)
+          wi <- GasEx.SVPleaf * g0(Const.RHi, 1, "1") /
+            (Meas.Pa + Meas.DeltaPcham)
           (GasEx.E  * (unity - (wi + Meas.H2Os) / 2) /
-              (wi - Meas.H2Os))@'mol*m^-2*s^-1'
+              (wi - Meas.H2Os))@"mol*m^-2*s^-1"
         }
       ),
       cuticular_conductance = list(
@@ -620,17 +622,18 @@ calcs <- function() {
           # Marquez, Stuart-Williams and Farquhar 2021 Eq. 9 and 10
           # but split into an adaxial and abaxial part
           # also note licor gbw is ONE-SIDED and is doubled here.
-          wi <- GasEx.SVPleaf / (Meas.Pa + Meas.DeltaPcham)
+          wi <- GasEx.SVPleaf * g0(Const.RHi, 1, "1") /
+                   (Meas.Pa + Meas.DeltaPcham)
           ws <- (GasEx.E / (2 * GasEx.gbw) * (unity - Meas.H2Os / 2) +
                    Meas.H2Os) / (unity + GasEx.E / (4 * GasEx.gbw))
           Es <- GasEx.E - Const.gcw * (wi - ws)
           gtw_up <- (1 / ((wi - ws) * (1 + Const.K) /
                             (GasEx.E - Es * (wi + ws) / 2) +
-                            1 / (2 * GasEx.gbw)))
+                            1 / (GasEx.gbw)))
           gtw_low <- (Const.K / ((wi - ws) * (1 + Const.K) /
                                    (GasEx.E - Es * (wi + ws) / 2) +
-                                   Const.K / (2 * GasEx.gbw)))
-          (gtw_up + gtw_low)@'mol*m^-2*s^-1'
+                                   Const.K / (GasEx.gbw)))
+          (gtw_up + gtw_low)@"mol*m^-2*s^-1"
         }
       )
     ),
@@ -644,7 +647,7 @@ calcs <- function() {
           (2 / (rt - rb + sign(rt) * sqrt((rt - rb) ^ 2 + 4 * Const.K /
                                             (Const.K + 1) ^ 2 * (2 * rt * rb -
                                                                    rb ^ 2)))
-          )@'mol*m^-2*s^-1'
+          )@"mol*m^-2*s^-1"
         }
       ),
       cuticular_conductance = list(
@@ -659,7 +662,7 @@ calcs <- function() {
           k <- pmax(Const.K, 1e-12) # avoid /0
           Q <-  2 * k * rb * (rb - 2 * rt) / (1 + k)^2
           ((rt - rb - Q * Const.gcw - sign(rt) * sqrt(-2 * Q + (rb - rt)^2)) /
-              Q)@'mol*m^-2*s^-1'
+              Q)@"mol*m^-2*s^-1"
         }
       )
     ),
@@ -687,11 +690,6 @@ calcs <- function() {
           k <- pmax(Const.K, 1e-12)
           1 / (1 / gb + (1 + k) / gl) + k / (k / gb + (1 + k) / gl)
         }
-      ),
-      gfs3000.gfs3000_gtc = list(
-        desc = "Total conductance to CO2 as calculated by the GFS-3000.",
-        deps = "",
-        fn = function() { GasEx.gsw / 1.56 }
       )
     ),
     GasEx.Cs = list(
@@ -702,7 +700,7 @@ calcs <- function() {
           # Based on Cs-Mix of Marquez thesis and Note 6 Marquez et al. 2023
          ((GasEx.Ca * (2 * GasEx.gbw / (1.6^(2 / 3)) - GasEx.E / 2) -
                    GasEx.A) / (2 * GasEx.gbw / (1.6^(2 / 3)) +
-                                 GasEx.E / 2))@'\U00B5mol*mol^-1'
+                                 GasEx.E / 2))@"\U00B5mol*mol^-1"
         }
       )
     ),
@@ -712,7 +710,7 @@ calcs <- function() {
         deps = "",
         fn =  function() {
           (((GasEx.gtc - GasEx.E / 2) * GasEx.Ca - GasEx.A) /
-             (GasEx.gtc + GasEx.E / 2))@'\U00B5mol*mol^-1'
+             (GasEx.gtc + GasEx.E / 2))@"\U00B5mol*mol^-1"
         }
       ),
       cuticular_conductance = list(
@@ -722,8 +720,14 @@ calcs <- function() {
         deps = "",
         fn = function() {
           glc <- Const.gcc + GasEx.gsw / 1.6
-          ((GasEx.Cs * (glc - GasEx.E / 2) - GasEx.A) /
-              (glc + GasEx.E / 2))@'\U00B5mol*mol^-1'
+          # note licor gbw is ONE-SIDED and is doubled here.
+          wi <- GasEx.SVPleaf * g0(Const.RHi, 1, "1") /
+            (Meas.Pa + Meas.DeltaPcham)
+          ws <- (GasEx.E / (2 * GasEx.gbw) * (unity - Meas.H2Os / 2) +
+                   Meas.H2Os) / (unity + GasEx.E / (4 * GasEx.gbw))
+          Es <- GasEx.E - Const.gcw * (wi - ws)
+          ((GasEx.Cs * (glc - Es / 2) - GasEx.A) /
+              (glc + Es / 2))@"\U00B5mol*mol^-1"
         }
       )
     ),
@@ -738,7 +742,7 @@ calcs <- function() {
       default = list(
         desc = "",
         deps = "",
-        fn = function() { (GasEx.Ci * (Meas.Pa + Meas.DeltaPcham))@'Pa' }
+        fn = function() { (GasEx.Ci * (Meas.Pa + Meas.DeltaPcham))@"Pa" }
       )
     ),
     Meas.H2Oa = list(
@@ -750,9 +754,9 @@ calcs <- function() {
         fn = function() {
           #FIXME: error on missing cal? or Raw?
           hc <- get_cal(SysConst.UserCal, SysConst.FactCal)
-          ab <- span_abs(hc, 'h2o', 'a', Meas.Pa, Raw.H2OaAbs)
-          (abs2frac(hc, 'h2o', 'a', ab) * Status.Ts@"K" *
-             psiH2O(hc, SysConst.Oxygen@'%'))@'mmol*mol^-1'
+          ab <- span_abs(hc, "h2o", "a", Meas.Pa, Raw.H2OaAbs)
+          (abs2frac(hc, "h2o", "a", ab) * Status.Ts@"K" *
+             psiH2O(hc, Const.Oxygen@"%"))@"mmol*mol^-1"
         }
       ),
       O2_correction.li6800 = list(
@@ -763,7 +767,7 @@ calcs <- function() {
         fn = function() {
           #FIXME: warning on missing cal?
           (Raw.H2Oa * psiH2O(get_cal(SysConst.UserCal, SysConst.FactCal),
-                              SysConst.Oxygen@'%'))@'mmol*mol^-1'
+                              Const.Oxygen@"%"))@"mmol*mol^-1"
         }
       ),
       O2_correction.gfs3000 = list(
@@ -774,7 +778,7 @@ calcs <- function() {
         fn = function() {
           # base factor on H2Oa instead? Effect is minor...
           (Raw.H2Oa *
-             gfs_o2_factor(Raw.H2Or, SysConst.Oxygen@'%'))@'mmol*mol^-1'
+             gfs_o2_factor(Raw.H2Or, Const.Oxygen@"%"))@"mmol*mol^-1"
         }
       )
     ),
@@ -812,9 +816,9 @@ calcs <- function() {
         fn = function() {
           #FIXME: error on missing cal? or Raw?
           hc <- get_cal(SysConst.UserCal, SysConst.FactCal)
-          ab <- span_abs(hc, 'h2o', 'b', Meas.Pa, Raw.H2OrAbs)
-          (abs2frac(hc, 'h2o', 'b', ab) * Status.Tr@"K" *
-              psiH2O(hc, SysConst.Oxygen@'%'))@'mmol*mol^-1'
+          ab <- span_abs(hc, "h2o", "b", Meas.Pa, Raw.H2OrAbs)
+          (abs2frac(hc, "h2o", "b", ab) * Status.Tr@"K" *
+              psiH2O(hc, Const.Oxygen@"%"))@"mmol*mol^-1"
         }
       ),
       O2_correction.li6400 = list(
@@ -841,7 +845,7 @@ calcs <- function() {
         fn = function() {
           #FIXME: warning on missing cal
           (Raw.H2Or * psiH2O(get_cal(SysConst.UserCal, SysConst.FactCal),
-                              SysConst.Oxygen@'%'))@'mmol*mol^-1'
+                              Const.Oxygen@"%"))@"mmol*mol^-1"
         }
       ),
       O2_correction.gfs3000 = list(
@@ -851,7 +855,7 @@ calcs <- function() {
         deps = "match",
         fn = function() {
           (Raw.H2Or * gfs_o2_factor(Raw.H2Or,
-                                     SysConst.Oxygen@'%'))@'mmol*mol^-1'
+                                     Const.Oxygen@"%"))@"mmol*mol^-1"
 
         }
       )
@@ -865,10 +869,10 @@ calcs <- function() {
         fn = function() {
           #FIXME: error on missing cal? or Raw?
           hc <- get_cal(SysConst.UserCal, SysConst.FactCal)
-          p <- psiCO2(hc, SysConst.Oxygen, Meas.H2Oa)
-          ab <- span_abs(hc, 'co2', 'a', Meas.Pa, Raw.CO2aAbs)
-          (abs2frac(hc, 'co2', 'a', ab / p) *
-              Status.Ts@"K" * p)@'\U00B5mol*mol^-1'
+          p <- psiCO2(hc, Const.Oxygen, Meas.H2Oa)
+          ab <- span_abs(hc, "co2", "a", Meas.Pa, Raw.CO2aAbs)
+          (abs2frac(hc, "co2", "a", ab / p) *
+              Status.Ts@"K" * p)@"\U00B5mol*mol^-1"
 
         }
       ),
@@ -880,9 +884,9 @@ calcs <- function() {
         fn = function() {
           #FIXME: warning on missing cal
           hc <- get_cal(SysConst.UserCal, SysConst.FactCal)
-          p <- psiCO2(hc, SysConst.Oxygen, Meas.H2Oa)
-          (abs2frac(hc, 'co2', 'a', Raw.CO2aAbsP / p) * Status.Ts@'K' *
-              p)@'\U00B5mol*mol^-1'
+          p <- psiCO2(hc, Const.Oxygen, Meas.H2Oa)
+          (abs2frac(hc, "co2", "a", Raw.CO2aAbsP / p) * Status.Ts@"K" *
+              p)@"\U00B5mol*mol^-1"
         }
       )
     ),
@@ -895,10 +899,10 @@ calcs <- function() {
         fn = function() {
           #FIXME: error on missing cal? or Raw?
           hc <- get_cal(SysConst.UserCal, SysConst.FactCal)
-          p <- psiCO2(hc, SysConst.Oxygen, Meas.H2Or)
-          ab <- span_abs(hc, 'co2', 'b', Meas.Pa, Raw.CO2rAbs)
-          (abs2frac(hc, 'co2', 'b', ab / p) *
-              Status.Tr@"K" * p)@'\U00B5mol*mol^-1'
+          p <- psiCO2(hc, Const.Oxygen, Meas.H2Or)
+          ab <- span_abs(hc, "co2", "b", Meas.Pa, Raw.CO2rAbs)
+          (abs2frac(hc, "co2", "b", ab / p) *
+              Status.Tr@"K" * p)@"\U00B5mol*mol^-1"
 
         }
       ),
@@ -910,9 +914,9 @@ calcs <- function() {
         fn = function() {
           #FIXME: warning on missing cal
           hc <- get_cal(SysConst.UserCal, SysConst.FactCal)
-          p <- psiCO2(hc, SysConst.Oxygen, Meas.H2Or)
-          (abs2frac(hc, 'co2', 'b', Raw.CO2rAbsP / p) * Status.Tr@'K' *
-              p)@'\U00B5mol*mol^-1'
+          p <- psiCO2(hc, Const.Oxygen, Meas.H2Or)
+          (abs2frac(hc, "co2", "b", Raw.CO2rAbsP / p) * Status.Tr@"K" *
+              p)@"\U00B5mol*mol^-1"
         }
       )
     ),
@@ -933,8 +937,8 @@ calcs <- function() {
                       "CO2 mol fraction using the GFS-3000 match correction."),
         deps = "",
         fn =  function() {
-          (Meas.CO2a@'\U00B5mol*mol^-1' +
-             MchEvent.CO2match@'\U00B5mol*mol^-1')
+          (Meas.CO2a@"\U00B5mol*mol^-1" +
+             MchEvent.CO2match@"\U00B5mol*mol^-1")
         }
       )
     ),
@@ -955,7 +959,7 @@ calcs <- function() {
                        "H2O mol fraction using the GFS-3000 match correction."),
         deps = "",
         fn = function() {
-          (Meas.H2Oa@'mmol*mol^-1' + MchEvent.H2Omatch@'mmol*mol^-1')
+          (Meas.H2Oa@"mmol*mol^-1" + MchEvent.H2Omatch@"mmol*mol^-1")
         }
       )
     ),
@@ -964,7 +968,7 @@ calcs <- function() {
         desc = "",
         deps = "",
         fn = function() {
-          Fv_Fm <- 1 - g0(FLR.Fo, NA) / g0(FLR.Fm, NA)
+          Fv_Fm <- 1 - g0(FLR.Fo, NA_real_) / g0(FLR.Fm, NA_real_)
         }
       )
     ),
@@ -972,14 +976,14 @@ calcs <- function() {
       default = list(
         desc = "",
         deps = "",
-        fn = function() { 1 - g0(FLR.Fop, NA)/g0(FLR.Fmp, NA) }
+        fn = function() { 1 - g0(FLR.Fop, NA_real_)/g0(FLR.Fmp, NA_real_) }
       )
     ),
     FLR.phiPS2 = list(
       default = list(
         desc = "",
         deps = "",
-        fn = function() { 1 - g0(FLR.Fs, NA)/g0(FLR.Fmp, NA) }
+        fn = function() { 1 - g0(FLR.Fs, NA_real_)/g0(FLR.Fmp, NA_real_) }
       )
     ),
     FLR.phiCO2 = list(
@@ -987,7 +991,7 @@ calcs <- function() {
         desc = "Quantum efficency of the carboxylation rate.",
         deps = "",
         fn = function() {
-          ((GasEx.A - g0(FLR.Adark, NA, "\U00B5mol*m^-2*s^-1")) /
+          ((GasEx.A - g0(FLR.Adark, NA_real_, "\U00B5mol*m^-2*s^-1")) /
             FLR.QabsFs)@"\U00B5mol*mol^-1" }
       )
     ),
@@ -996,7 +1000,7 @@ calcs <- function() {
         desc = "",
         deps = "",
         fn = function() {
-          g0(FLR.QinFs, LeafQ.Qin, '\U00B5mol*m^-2*s^-1') * LeafQ.alpha
+          g0(FLR.QinFs, LeafQ.Qin, "\U00B5mol*m^-2*s^-1") * LeafQ.alpha
         }
       )
     ),
@@ -1005,7 +1009,7 @@ calcs <- function() {
         desc = "",
         deps = "",
         fn = function() {
-          g0(FLR.phiPS2, NA) * g0(FLR.fPS2, 0.5) * FLR.QabsFs
+          g0(FLR.phiPS2, NA_real_) * g0(Const.fPS2, 0.5) * FLR.QabsFs
           }
       )
     ),
@@ -1013,8 +1017,8 @@ calcs <- function() {
       default = list(
         desc = "",
         deps = "",
-        fn = function() { (g0(FLR.Fm, NA) - g0(FLR.Fmp, NA)) /
-            g0(FLR.Fmp, NA)
+        fn = function() { (g0(FLR.Fm, NA_real_) - g0(FLR.Fmp, NA_real_)) /
+            g0(FLR.Fmp, NA_real_)
           }
       )
     ),
@@ -1022,8 +1026,8 @@ calcs <- function() {
       default = list(
         desc = "",
         deps = "",
-        fn = function() { (g0(FLR.Fm, NA) - g0(FLR.Fmp, NA)) /
-            (g0(FLR.Fm, NA) - g0(FLR.Fop, NA))
+        fn = function() { (g0(FLR.Fm, NA_real_) - g0(FLR.Fmp, NA_real_)) /
+            (g0(FLR.Fm, NA_real_) - g0(FLR.Fop, NA_real_))
         }
       )
     ),
@@ -1031,8 +1035,8 @@ calcs <- function() {
       default = list(
         desc = "",
         deps = "",
-        fn = function() { (g0(FLR.Fm, NA) - g0(FLR.Fmp, NA)) /
-            (g0(FLR.Fm, NA) - g0(FLR.Fo, NA))
+        fn = function() { (g0(FLR.Fm, NA_real_) - g0(FLR.Fmp, NA_real_)) /
+            (g0(FLR.Fm, NA_real_) - g0(FLR.Fo, NA_real_))
         }
       )
     ),
@@ -1040,8 +1044,8 @@ calcs <- function() {
       default = list(
         desc = "",
         deps = "",
-        fn = function() { (g0(FLR.Fmp, NA) - g0(FLR.Fs, NA)) /
-            (g0(FLR.Fmp, NA) - g0(FLR.Fop, NA))
+        fn = function() { (g0(FLR.Fmp, NA_real_) - g0(FLR.Fs, NA_real_)) /
+            (g0(FLR.Fmp, NA_real_) - g0(FLR.Fop, NA_real_))
         }
       )
     ),
@@ -1049,8 +1053,8 @@ calcs <- function() {
       default = list(
         desc = "",
         deps = "",
-        fn = function() { (g0(FLR.Fmp, NA) - g0(FLR.Fs, NA)) /
-            (g0(FLR.Fmp, NA) - g0(FLR.Fo, NA))
+        fn = function() { (g0(FLR.Fmp, NA_real_) - g0(FLR.Fs, NA_real_)) /
+            (g0(FLR.Fmp, NA_real_) - g0(FLR.Fo, NA_real_))
         }
       )
     ),
@@ -1058,8 +1062,30 @@ calcs <- function() {
       default = list(
         desc = "",
         deps = "",
-        fn = function() { g0(FLR.qP, NA) * g0(FLR.Fop, NA) /
-            g0(FLR.Fs, NA)
+        fn = function() { g0(FLR.qP, NA_real_) * g0(FLR.Fop, NA_real_) /
+            g0(FLR.Fs, NA_real_)
+        }
+      )
+    ),
+    FLR.Fop = list(
+      default = list(
+        desc = "",
+        deps = "",
+        fn = function() {
+          fopalt <- g0(FLR.FopAlt, NA_real_)
+          fmin <- g0(FLR.Fmin, na_replace = TRUE) * rep(1, length(fopalt))
+          fmin[fmin == 0] <- g0(FLR.FopAlt, NA_real_)[fmin == 0]
+        }
+      )
+    ),
+    FLR.FopAlt = list(
+      default = list(
+        desc = "",
+        deps = "",
+        fn = function() {
+          g0(FLR.Fo, NA_real_) /
+            (g0(FLR.Fv_Fm, NA_real_) + g0(FLR.Fo, NA_real_) /
+               g0(FLR.Fmp, NA_real_))
         }
       )
     ),
@@ -1078,9 +1104,9 @@ calcs <- function() {
                       "accurate estimates for Const.RL and Const.GammaStar."),
         deps = "",
         fn = function() {
-          GP <- GasEx.A + g0(Const.RL, NA)
-          JF <- g0(FLR.ETR, NA)
-          g0(Const.GammaStar, NA) * (JF + 8 * GP) / (JF - 4 * GP)
+          GP <- GasEx.A + g0(Const.RL, NA_real_, "\U00B5mol*m^-2*s^-1")
+          JF <- g0(FLR.ETR, NA_real_, "\U00B5mol*m^-2*s^-1")
+          g0(Const.GammaStar, NA_real_) * (JF + 8 * GP) / (JF - 4 * GP)
         }
       )
     ),
@@ -1168,8 +1194,8 @@ calcs <- function() {
         desc = "",
         deps = "",
         fn = function() {
-          GS <- g0(Const.GammaStar, NA)
-          RL <- g0(Const.RL, NA)
+          GS <- g0(Const.GammaStar, NA_real_, "\U00B5mol*mol^-1")
+          RL <- g0(Const.RL, NA_real_, "\U00B5mol*m^-2*s^-1")
           t <- d13C.t@.
           one <- 1@"1"
           #Farquhar and Cernusak 2012, Eq 11
@@ -1187,8 +1213,8 @@ calcs <- function() {
         desc = "",
         deps = "",
         fn = function() {
-          GS <- g0(Const.GammaStar, NA)
-          RL <- g0(Const.RL, NA)
+          GS <- g0(Const.GammaStar, NA_real_, "\U00B5mol*mol^-1")
+          RL <- g0(Const.RL, NA_real_, "\U00B5mol*m^-2*s^-1")
           t <- d13C.t@.
           one <- 1@"1"
           wh <- 0@"permille"
@@ -1217,7 +1243,7 @@ calcs <- function() {
         desc = "",
         deps = "",
         fn = function() {
-          RL <- g0(Const.RL, NA)
+          RL <- g0(Const.RL, NA_real_, "\U00B5mol*m^-2*s^-1")
           t <- d13C.t@.
           one <- 1@"1"
           rm <- ((1 - t) / (1 + t) * d13C.DeltaiDeltao * GasEx.pCa /
@@ -1232,7 +1258,7 @@ calcs <- function() {
         desc = "",
         deps = "",
         fn = function() {
-          RL <- g0(Const.RL, NA)
+          RL <- g0(Const.RL, NA_real_, "\U00B5mol*m^-2*s^-1")
           t <- d13C.t@.
           one <- 1@"1"
           #Busch et al 2020, S26
@@ -1266,46 +1292,46 @@ calcs <- function() {
       default = list(
         desc = "",
         deps = "",
-        fn = function() { g0(SysObs.Instrument, NA) }
+        fn = function() { g0(SysObs.Instrument, NA_character_) }
       ),
       li6400 = list(
         desc = "",
         deps = "",
         fn = function() {
-          inst <- g0(SysObs.Instrument, NA)
+          inst <- g0(SysObs.Instrument, NA_character_)
           if (!isTRUE(all(SysObs.Instrument == "Li6400")))
-            warning('\n  Applying Li6400 specific calculations to ',
-                    'rows not measured by an Li6400.\n')
+            warning("\n  Applying Li6400 specific calculations to ",
+                    "rows not measured by an Li6400.\n")
           inst }
       ),
       li6800 = list(
         desc = "",
         deps = "",
         fn = function() {
-          inst <- g0(SysObs.Instrument, NA)
+          inst <- g0(SysObs.Instrument, NA_character_)
           if (!isTRUE(all(SysObs.Instrument == "Li6800")))
-            warning('\n  Applying Li6800 specific calculations to ',
-                    'rows not measured by an Li6800.\n')
+            warning("\n  Applying Li6800 specific calculations to ",
+                    "rows not measured by an Li6800.\n")
           inst }
       ),
       gfs3000 = list(
         desc = "",
         deps = "",
         fn = function() {
-          inst <- g0(SysObs.Instrument, NA)
+          inst <- g0(SysObs.Instrument, NA_character_)
           if (!isTRUE(all(SysObs.Instrument == "GFS3000")))
-            warning('\n  Applying GFS3000 specific calculations to ',
-                    'rows not measured by a GFS3000.\n')
+            warning("\n  Applying GFS3000 specific calculations to ",
+                    "rows not measured by a GFS3000.\n")
           inst }
       ),
       ciras4 = list(
         desc = "",
         deps = "",
         fn = function() {
-          inst <- g0(SysObs.Instrument, NA)
+          inst <- g0(SysObs.Instrument, NA_character_)
           if (!isTRUE(all(SysObs.Instrument == "CIRAS4")))
-            warning('\n  Applying CIRAS4 specific calculations to ',
-                    'rows not measured by a CIRAS4.\n')
+            warning("\n  Applying CIRAS4 specific calculations to ",
+                    "rows not measured by a CIRAS4.\n")
           inst }
       )
     )

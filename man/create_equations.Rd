@@ -34,7 +34,7 @@ exampledir <- system.file("extdata", package = "gasanalyzer")
 import_factory_cals(exampledir)
 
 # read data from a txt file:
-li6800 <- read_6800_txt(paste0(exampledir, "//lowo2"))
+li6800 <- read_6800_txt(file.path(exampledir, "lowo2"))
 
 # passing an invalid flags shows which flags are valid:
 \donttest{create_equations("help")}

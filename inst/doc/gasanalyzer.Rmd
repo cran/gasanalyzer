@@ -1,5 +1,5 @@
 ---
-title: "gasanalyzer"
+title: "Analysis of Real-World Gas-Exchange Data using Gasanalyzer"
 output:
   rmarkdown::html_vignette:
     df_print: paged
@@ -69,14 +69,14 @@ xlsxfile <- read_6800_xlsx(paste(exampleFiles, "lowo2.xlsx", sep = "/"))
 txtfile <- read_6800_txt(paste(exampleFiles, "lowo2", sep = "/"))
 ```
 
-The LI-6800 confusingly stores the results of divisions by zero as zero in the `txt` file. After excluding the equations (stored in list columns) and columns containing the results of divisions by zero, there are very few differences between both files:
+The LI-6800 confusingly stores the results of divisions by zero as zero in the `txt` file. After excluding columns containing the results of divisions by zero and the column with equations (a list column), there are very few differences between both files:
 
 ```{r}
 # exclude list columns with equations, and divisions by zero
-excludeCols <- sapply(xlsxfile, 
+excludeCols <- vapply(xlsxfile, 
                       FUN=\(x) is.list(x) || 
                         all(is.infinite(x)) ||
-                        all(is.nan(x)))
+                        all(is.nan(x)), TRUE)
 
 # Interestingly, Leak.Fan reported in the txt file differs slightly
 # from that in the xlsx. It is likely caused by rounding/averaging in the
@@ -96,7 +96,7 @@ nice_labels <- function(plt) {
 }
 
 #generate some descriptive stats  and plotmath it with a call to var2label:
-descr <- colMeans(xlsxfile[c("LeafQ.Qin", "Meas.Tleaf", "SysConst.Oxygen")])
+descr <- colMeans(xlsxfile[c("LeafQ.Qin", "Meas.Tleaf", "Const.Oxygen")])
 dlist <- var2label(rep(names(descr), 2),
                    use_units = rep(c(FALSE, TRUE), each = 3),
                    val = c(rep(NA, 3), as.character(descr)),
@@ -110,7 +110,7 @@ AvsCi1 <- xlsxfile |> ggplot(aes(GasEx.Ci, GasEx.A)) + geom_point() +
 nice_labels(AvsCi1)
 ```
 
-If a researcher would like to make changes to some of constants used by the instrument for calculating derived variables, all data should be recalculated to take the effect into account. For example, an application note by the instrument vendor^[LI-COR Biosciences Inc (2022) Photosynthesis | Complementary Leaf Physiology Measurements: The LI-600 and LI-6800. [Link](https://www.licor.com/env/support/Photosynthesis/topics/complementary-photosynthesis-measurements.html)] shows how to use complimentary measurements with a porometer to determine the ratio of stomatal conductance between both sides of the leaves. For the leaf in this experiment, the ratio was 0.22. Such corrections typically have only very small effects because of the high boundary layer conductance in the leaf chambers that are commonly used for such experiments.
+If a researcher would like to make changes to some of constants used by the instrument for calculating derived variables, all data should be recalculated to take the effect into account. For example, an application note by the instrument vendor^[LI-COR Biosciences Inc (2022) Photosynthesis | Complementary Leaf Physiology Measurements: The LI-600 and LI-6800. [Link](https://www.licor.com/env/support/Photosynthesis/topics/complementary-photosynthesis-measurements.html)] shows how to use complimentary measurements with a porometer to determine the ratio of stomatal conductances between both sides of the leaves. For the leaf in this experiment, the ratio was 0.22. Such corrections typically have only very small effects because of the high boundary layer conductance in the leaf chambers that are commonly used for such experiments.
 
 ```{r}
 gswOld <- xlsxfile$GasEx.gsw
@@ -128,7 +128,7 @@ where $\Phi_{PSII}$ is the operating quantum efficiency of PSII, and $Q_{in}$ is
 
 Calculations implemented by the vendor typically assume $\beta$ is 0.5 and $\alpha$ is around 0.85 (possibly adjusted for the spectrum of the light source used). An interesting application of this electron transport estimate is to to back-calculate the CO~2~ concentration at the site of carboxylation, and by extension estimate the mesophyll conductance ($g_m$^[Harley PC, Loreto F, Di Marco G, Sharkey TD (1992) Theoretical Considerations when Estimating the Mesophyll Conductance to CO~2~ Flux by Analysis of the Response of Photosynthesis to CO~2~. Plant Physiol 98:1429–1436. [Link](https://doi.org/10.1104/pp.98.4.1429)]).
 
-However, leaves vary in the amount of light absorbed. Moreover, not all of the absorbed light is used for photosynthetic carbon reduction. To address such concerns, an additional estimate for the electron transport rate ($J_C$) may be obtained by measuring gas-exchange under non-photorespiratory conditions (i.e. at low oxygen). In this case, it follows from the C~3~ biochemical model^[Farquhar GD, von Caemmerer S, Berry JA (1980) A biochemical model of photosynthetic CO2 assimilation in leaves of C3 species. Planta 149:78–90. [Link](https://doi.org/10.1007/BF00386231)] that:
+However, leaves vary in the amount of light absorbed. Moreover, not all of the absorbed light is used for photosynthetic carbon reduction. To address such concerns, an additional estimate for the electron transport rate ($J_C$) may be obtained by measuring gas exchange under non-photorespiratory conditions (i.e. at low oxygen). In this case, it follows from the C~3~ biochemical model^[Farquhar GD, von Caemmerer S, Berry JA (1980) A biochemical model of photosynthetic CO2 assimilation in leaves of C3 species. Planta 149:78–90. [Link](https://doi.org/10.1007/BF00386231)] that:
 
 $$J_C \approx 4(A + R_L) \to A \approx J_C/4 - R_L$$
 
@@ -176,7 +176,7 @@ xlsxEqs <- xlsxfile$gasanalyzer.Equations[[1]]
 print(xlsxEqs$LeafQ.alpha)
 
 # add our custom alpha by dividing it through the used beta:
-xlsxfile$Custom.alpha <- alphabeta / xlsxfile$FLR.fPS2
+xlsxfile$Custom.alpha <- alphabeta / xlsxfile$Const.fPS2
 # and change the equation to use the new value:
 xlsxEqs <- modify_equations(xlsxEqs, LeafQ.alpha = \() {Custom.alpha})
 
@@ -216,7 +216,7 @@ The equations depend on calibration values that depend on the instrument type, a
 To investigate how much the results would differ when a user forgot to enter the correct O~2~ concentration during the measurement, I have recalculated the data using an oxygen concentration of 21 \%:
 ```{r}
 xlsxfile21 <- xlsxfileRecal |> 
-  transform(SysConst.Oxygen = set_units(21, "%")) |>
+  transform(Const.Oxygen = set_units(21, "%")) |>
   recalculate(RecalEqs)
 ```
 
@@ -228,7 +228,7 @@ AvsCi21 <- xlsxfile21 |> ggplot() +
                  xlsxfileRecal$GasEx.A, shape = "1% O2")) +
   scale_shape_manual(name = "Calculated at:",
                      values = c("1% O2" = 1, "21% O2" = 2)) +
-  theme(legend.position = "inside", legend.position.inside = c(0.75, 0.25))
+  theme(legend.position = "inside", legend.position.inside = c(0.7, 0.3))
 
 AvsPhiQin21 <-
   xlsxfile21 |>
@@ -269,22 +269,22 @@ data.frame(aggregate(list(RH = ACi$GasEx.RHcham),
   knitr::kable()
 
 ```
-The $C_i$ estimates provided by the GFS-3000 instrument do not take boundary layer conductance into account. `gasanalyzer` provides the possibility to recalculate the data using a predefined set of equations, based on those described in the LI-6800 manual. The boundary layer conductance ($g_{bw}$) of the default chamber at different fan speeds was provided by the instrument vendor (Heinz Walz GmbH). However, the effect on $C_i$ is small when the stomatal conductance ($g_s$) is much lower than $g_{bw}$:
+The $C_i$ estimates provided by the GFS-3000 instrument do not take boundary layer conductance into account. `gasanalyzer` provides the possibility to recalculate the data using predefined sets of equations. The boundary layer conductance ($g_{bw}$) of the default chamber at different fan speeds was provided by the instrument vendor (Heinz Walz GmbH). However, the effect on $C_i$ is small when the stomatal conductance ($g_s$) is much lower than $g_{bw}$:
 
 ```{r}
 gfsEqs <- create_equations(c("default", "gfs3000"))
 ACi2 <- recalculate(ACi, gfsEqs)
 all.equal(ACi$GasEx.Ci, ACi2$GasEx.Ci)
 ```
-The relationship between $A_n$ and $C_i$ can be used to obtain *in vivo* estimates for parameters related to biochemical processes underlying photosynthesis. The R package `photosynthesis`^[Stinziano JR, Roback C, Sargent D, et al (2021) Principles of resilient coding for plant ecophysiologists. AoB PLANTS 13:plab059. [Link](https://doi.org/10.1093/aobpla/plab059)] implements methods to obtain such estimates. Recently it has been suggested^[Márquez DA, Stuart-Williams H, Farquhar GD (2021) An improved theory for calculating leaf gas exchange more precisely accounting for small fluxes. Nat Plants 7:317–326. [Link](https://doi.org/10.1038/s41477-021-00861-w)] that the $C_i$ values calculated using equations implemented in most gas-exchange instruments are biased because  the underlying theory did not account for gas fluxes through the cuticula. Since estimates for cuticular conductance are not widely available, it can be useful to perform a sensitivity analysis on gas-exchange data to investigate the possible consequences of limiting cuticular conductance. A first assessment of the importance of including cuticular conductance was recently published^[Lamour J, Davidson KJ, Ely KS, et al (2022) New calculations for photosynthesis measurement systems: what’s the impact for physiologists and modelers? New Phytol 233:592–598. [Link]( https://doi.org/10.1111/nph.17762)]. Here, an example is shown that includes a similar analysis, but also test for the effect of potential bias in the stomatal ratio (`Const.K`), leaf temperature (`Meas.Tleaf`) and the reference CO~2~ and H~2~O mol fraction reported by the instrument (`Meas.CO2r~` and `Meas.H2Or`). The `permutate()` method was used to create a range of values for these quantities while keeping all other measured and assumed variables constant. Subsequently all derived variables are recomputed:
+The relationship between $A_n$ and $C_i$ can be used to obtain *in vivo* estimates for parameters related to biochemical processes underlying photosynthesis. The R package `photosynthesis`^[Stinziano JR, Roback C, Sargent D, et al (2021) Principles of resilient coding for plant ecophysiologists. AoB PLANTS 13:plab059. [Link](https://doi.org/10.1093/aobpla/plab059)] implements methods to obtain such estimates. Recently it has been suggested^[Márquez DA, Stuart-Williams H, Farquhar GD (2021) An improved theory for calculating leaf gas exchange more precisely accounting for small fluxes. Nat Plants 7:317–326. [Link](https://doi.org/10.1038/s41477-021-00861-w)] that the $C_i$ values calculated using equations implemented in most gas-exchange instruments are biased because  the underlying theory did not account for gas fluxes through the cuticula. Since estimates for cuticular conductance are not widely available, it can be useful to perform a sensitivity analysis on gas-exchange data to investigate the possible consequences of limiting cuticular conductance. A first assessment of the importance of including cuticular conductance was recently published^[Lamour J, Davidson KJ, Ely KS, et al (2022) New calculations for photosynthesis measurement systems: what’s the impact for physiologists and modelers? New Phytol 233:592–598. [Link]( https://doi.org/10.1111/nph.17762)]. Here, an example is shown that includes a similar analysis, but also test for the effect of potential bias in assumed values for the ratio of stomatal conductances between both sides of the leaf (`Const.K`), cuticular conductance (`Const.gcw`), assumed relative humidity in the stomatal cavities (`Const.RHi`), and the measured values for the leaf temperature (`Meas.Tleaf`) and H~2~O mol fraction reported by the instrument (`Meas.H2Or`). The `permutate()` method was used to create a range of values for these quantities while keeping all other measured and assumed variables constant. Subsequently all derived variables are recomputed:
 ```{r}
 # we define some constants that specify the relative value of the variables
 # on which we will do a sensitivity analysis:
-SAset <- c("Const.calk", "Const.calg", "Const.calh", "Const.calc",
-           "Const.calt")
+SAset <- c("Const.calk", "Const.calg", "Const.calrhi", "Const.calt",
+           "Const.calh")
 # symbols for the plot header:
-SAlabs <- c("italic(K)", "italic(g)[cw]", "'['*H[2]*O*']'[r]", 
-            "'['*CO[2]*']'[r]", "italic(T)[leaf]")
+SAlabs <- c("italic(K)", "italic(g)[cw]", "RH[i]", 
+            "italic(T)[leaf]", "'['*H[2]*O*']'[r]")
 # set defaults to 1 (100%) and define sequences over which to permutate
 ACi[SAset] <- 1
 # a 5% range:
@@ -297,19 +297,19 @@ MSFeqs <- create_equations(c("default", "gfs3000", "cuticular_conductance"),
                            Meas.Tleaf = function() { Const.calt * Meas.Tleaf },
                            Const.gcw = function() { Const.calg * Const.gcw },
                            Const.gcc = function() { Const.gcw / 20 },
-                           Meas.CO2r = function() { Const.calc * Meas.CO2r },
-                           Meas.CO2s = function() { Const.calc * Meas.CO2s },
+                           Const.RHi = function() { Const.calrhi * Const.RHi },
                            Meas.H2Or = function() { Const.calh * Meas.H2Or },
                            Meas.H2Os = function() { Const.calh * Meas.H2Os })
 
 # set gcw and use steady-state equations, then use the sequences
-ACi[["Const.gcw"]] <- set_units(30, "mmol*m^-2*s^-1")
-ACi[["Const.UseDynamic"]] <- FALSE
+ACi[["Const.gcw"]] <- set_units(25, "mmol*m^-2*s^-1")
+ACi[["Const.RHi"]] <- set_units(95, "%")
+ACi[["SysConst.UseDynamic"]] <- FALSE
 
 ACi.SA <- rbind(permutate(ACi, Const.calk = c(1, 1 + 20 * seq5)),
               permutate(ACi, Const.calg = 1 + 20 * seq5),
+              permutate(ACi, Const.calrhi = 1 + seq5),
               permutate(ACi, Const.calt = 1 + seq5),
-              permutate(ACi, Const.calc = 1 + seq5),
               permutate(ACi, Const.calh = 1 + seq5)) |>
   recalculate(MSFeqs)
 ```
@@ -326,7 +326,7 @@ fitaci_per_group <- function(df, aPars, g1, ...) {
   outCols <- c(grp, aPars, "group", "Plots")
   splitOn <- paste("~", paste(grp, collapse = " + "))
   # drop category name and Filename for shorter labels:
-  lbls <- sapply(strsplit(grp, ".", fixed = TRUE), \(x) rev(x)[1]) |>
+  lbls <- vapply(strsplit(grp, ".", fixed = TRUE), \(x) rev(x), c("nm","gp")) |>
     paste0(": ") |>
     gsub("Filename: ", "", x = _, fixed = TRUE) 
   # layout:
@@ -373,7 +373,7 @@ CO2curves.SA$gval <- 100 * (as.numeric(CO2curves.SA$gval) - 1)
 
 # calc mean over the 3 reps:
 CO2curves.SAm <- 
-  sapply(names(CO2curves.SA[aPars]),
+  lapply(names(CO2curves.SA[aPars]),
          \(x) {
            # relative change:
            rval <- 100 * as.numeric((CO2curves.SA[[x]] - 
@@ -386,8 +386,7 @@ CO2curves.SAm <-
                            aggregate(cbind(gval), byl, head, n = 1),
                            group = aggregate(group, byl, head, n = 1)[["x"]],
                            val = aggregate(rval, byl, mean)[["x"]],
-                           sd = aggregate(rval, byl, sd)[["x"]]))},
-         simplify = FALSE) |>
+                           sd = aggregate(rval, byl, sd)[["x"]]))}) |>
   do.call(rbind, args = _)
 ```
 
@@ -398,7 +397,7 @@ grid.arrange(grobs = CO2curves.SA$Plots[refids], ncol = 3)
 
 The code below creates a combined plot showing how a relative change in the 5 different variables affects the parameters of the C~3~ biochemical model:
 
-```{r eval=NOT_CRAN, fig.height=5, fig.width=7, purl=NOT_CRAN}
+```{r eval=NOT_CRAN, fig.height = 4.5, fig.width = 7, purl=NOT_CRAN}
 # make lbls factors for good order and plotmath
 CO2curves.SAm$group <- factor(CO2curves.SAm$group,
                               levels = SAset,
@@ -424,11 +423,11 @@ CO2curves.SAm |>
 
 ```
 
-The results show that for these measurements, accounting for stomatal or cuticular conductance has only very small effects on the estimates, but bias in the measured gas mole fractions and especially leaf temperature have much larger effects.
+The results show that for these measurements, accounting for stomatal or cuticular conductance has only very small effects on the estimates. Bias in leaf temperature measurements have much larger effects.
 
 ## 3. Combining gas-exchange data with isotope discrimination
 
-The ability to quick analyze the sensitivity of a result to different constants is also valuable for calculations of mesophyll conductance ($g_m$) from concurrent measurements of gas-exchange and carbon isotope discrimination. As an example, a data file from an experiment combining gas exchange with carbon isotope measurements was included. This file contains additional columns with the $\delta^{13}\textrm{C}$ value of the reference and sample air, and of the air in the glasshouse where the plants were grown. 
+The ability to quick analyze the sensitivity of a result to different constants is also valuable for calculations of mesophyll conductance ($g_m$) from concurrent measurements of gas exchange and carbon isotope discrimination. As an example, a data file from an experiment combining gas exchange with carbon isotope measurements was included. This file contains additional columns with the $\delta^{13}\textrm{C}$ value of the reference and sample air, and of the air in the glasshouse where the plants were grown. 
 
 The dataset can be used to estimate the mesophyll conductance. Such calculations require several fractionation factors describing how the abundance ratio of the carbon isotopes will change using a physiological or physical process. Since uncertainty exist surrounding the exact value of such factors, it is useful to analyze the data under several different assumptions. In addition, the effect of different assumptions in the isotopic model (see Busch et al. 2020^[Busch FA, Holloway-Phillips M, Stuart-Williams H, Farquhar GD (2020) Revisiting carbon isotope discrimination in C~3~ plants shows respiration rules when photosynthesis is low. Nat Plants 6:245–258. [Link](https://doi.org/10.1038/s41477-020-0606-6)]) can be tested.
 
@@ -436,7 +435,7 @@ In the following example, `gasanalyzer` is used to analyze the effect of the fra
 
 ```{r d13Crecalc}
 # load data
-isoFile <- paste(exampleFiles, "d13C.tsv", sep = "//")
+isoFile <- file.path(exampleFiles, "d13C.tsv")
 # read and recalculate
 isotopes <- read_gasexchange(isoFile) |>
   recalculate(create_equations(c("default", "li6400")))
@@ -538,12 +537,12 @@ units(gmEst$d13C.gm.sem) <- deparse_unit(isotopes$d13C.gm)
 
 Plot the results of the analysis:
 
-```{r fsens, fig.height=4, fig.width=5.5, eval = NOT_CRAN, purl = NOT_CRAN}
+```{r fsens, fig.height = 4, fig.width = 7, eval = NOT_CRAN, purl = NOT_CRAN}
 
 fsens <- ggplot(gmEst, aes(d13CConst.f, d13C.gm, 
                            ymin = d13C.gm - d13C.gm.sem,
                            ymax = d13C.gm + d13C.gm.sem, 
-                           shape = method, color=Model)) + 
+                           shape = method, color = Model)) + 
   geom_point(color = "black") +
   geom_ribbon(alpha = 0.1, color = NA) + guides(color = "none") +
   scale_shape_manual("Method:", values = c(1, 2)) + facet_wrap(vars(Model)) +
