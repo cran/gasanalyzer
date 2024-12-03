@@ -310,13 +310,14 @@ recalculate <- function(df, eqs = NULL) {
   units_options("simplify" = NA)
 
   package_ns <- parent.env(environment())
-  nms <- names(eqs)
 
   useflags <- eval(eqs[["gasanalyzer.UseFlags"]])
   if (length(useflags) == 0) useflags <- "default"
 
   df <- fixup_import(df, useflags, FALSE)
   eqs[["gasanalyzer.UseFlags"]] <- NULL
+  # get names _after_ setting UseFlags to NULL
+  nms <- names(eqs)
   ununit <- isFALSE(as.logical(eval(eqs[["gasanalyzer.UseEqUnits"]])))
   if (ununit) {
     #add cols if not there to prevent setting a NULL class below.

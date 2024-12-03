@@ -102,7 +102,7 @@ parse_6800_xlsx <- function(filename, extract_formula = FALSE,
   allCells <- xlsx_cells(filename, include_blank_cells = FALSE)
   class(allCells) <- "data.frame"
 
-  if (any(allCells$sheet=="Measurements"))
+  if (any(allCells$sheet == "Measurements"))
     msheet <- "Measurements"
   else
     msheet <- allCells$sheet[1]
@@ -370,10 +370,15 @@ read_6800_xlsx <- function(filename, recalculate = TRUE) {
 
   # It may occasionally be useful to use the calculated formula values
   # the files are actually exported uncalculated by the instrument, but
-  # for QA a comparison with a spreadsheet calc could be made
+  # for QA a comparison could be made after loading/saving in a spreadsheet app
   formulaVector <- !is.na(dtDF$formula)
-  # assume relevant formula content is numeric...
-  # This slightly breaks for SysConst.UseDynamic
+
+  # xlsx uses various not numerical values. Trouble is, DIV/0 might be Inf,-Inf,
+  # or even NaN. So I just replace all by NA
+  dtDF$content <- replace(dtDF$content,
+                          dtDF$content %in% c("#VALUE!", "#REF!", "#NAME?",
+                                              "#NULL!", "#N/A", "#DIV/0!"),
+                          NA)
   dtDF$numeric[formulaVector] <- as.numeric(dtDF$content[formulaVector])
 
   #add metadata here:
