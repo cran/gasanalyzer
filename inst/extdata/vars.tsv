@@ -27,6 +27,9 @@ default	Const	GammaStar	"Gamma^{""*""}"	µmol mol-1													User-specified C
 default	Const	RHi	RH[i]	%	100												User-specified relative humidity in the substomatal cavity. 
 default	Const	Oxygen	"""[""*O[2]*""]"""	%	21	Oi	mmol mol-1	SysConst	Oxygen	Oxygen%	%	Oxygen					Oxygen mole fraction in the chamber
 default	Const	fPS2	beta	numeric				FLR	PS2/1	PS2/1	numeric						Fraction of energy partitioned to PS2
+boundary_conductance	Const	asH	italic(a)[sH]	numeric	2												Fraction of the leaf area exchanging radiative and sensible heat
+boundary_conductance	Const	eps	epsilon	numeric	0.95												Thermal emissivity of the sample
+boundary_conductance	Const	ra_rv	"italic(r)[a]*""/""*italic(r)[v]"	numeric	1.082												the ratio between the heat and water conductance for the air in the chamber
 	GasEx																Variables related to gas-exchange calculations
 default	GasEx	Time		posix				GasEx	TIME								Unix time stamp for the measurement
 default	GasEx	E	italic(E)	mol m-2 s-1				GasEx	E	Trans	mol m-2 s-1	E					Transpiration rate
@@ -45,11 +48,14 @@ default	GasEx	Rabs	italic(R)[abs]	W m-2				GasEx	Rabs	R(W/m2)	W m-2						Absorbe
 default	GasEx	TleafEB	"italic(T)[""leaf,EB""]"	°C				GasEx	TleafEB								Leaf temperature from energy balance
 default	GasEx	TleafCnd	"italic(T)[""leaf,Cnd""]"	°C		Tleaf	°C	GasEx	TleafCnd	CTleaf	°C						Leaf temperature used for gas-exchange computations
 default	GasEx	TairCnd	"italic(T)[""air,Cnd""]"	°C		Tair	°C			CTair	°C						Air temperature used for gas-exchange computations
+default	GasEx	Twall	"italic(T)[""wall""]"	°C													Chamber wall temperature used for energy balance equations
 default	GasEx	SVPleaf	SVP[leaf]	kPa				GasEx	SVPleaf	SVTleaf	kPa						Saturation vapor pressure at leaf temperature
 default	GasEx	RHcham	RH[cham]	%		RHs	%	GasEx	RHcham	RH_S	%	rh			RH	%	Relative humidity in the chamber
 default	GasEx	VPcham	VP[cham]	kPa				GasEx	VPcham	vapS_kPa	kPa						Vapor pressure in the chamber
 default	GasEx	SVPcham	SVP[cham]	kPa				GasEx	SVPcham	SVTair	kPa						Saturation vapor pressure in the chamber
 default	GasEx	VPDleaf	VPD[leaf]	kPa		VPDleaf	kPa	GasEx	VPDleaf	VpdL	kPa				VPD	kPa	Vapor pressure deficit at leaf temperature
+boundary_conductance	GasEx	Cpm	"italic(c)[""p,m""]"	J mol-1 K-1	29.3												The molar heat capacity of the air in the chamber
+boundary_conductance	GasEx	lambda	lambda	J mol-1	44000												The latent heat of vaporization for water
 default	GasEx	LatHFlux	italic(E)[l]	W m-2				GasEx	LatHFlux								Latent heat flux contribution to the energy balance
 default	GasEx	SenHFlux	italic(H)[l]	W m-2				GasEx	SenHFlux								Sensible Heat Flux contribution to the energy balance
 default	GasEx	NetTherm		W m-2				GasEx	NetTherm								Net thermal contribution to the energy balance
@@ -135,7 +141,7 @@ default	Meas	Flow	Flow	µmol s-1		flow	µmol s-1	Meas	Flow	Flow	µmol s-1	Flow		
 default	Meas	Pa	italic(P)[a]	kPa	101.3	Patm	kPa	Meas	Pa	Press	kPa	Pamb	Pr	mbar	Patm	mbar	Atmospheric pressure
 default	Meas	DeltaPcham	Delta*P[cham]	kPa	0			Meas	ΔPcham								Chamber overpressure
 default	Meas	Tamb	italic(T)[amb]	°C								Tamb			Tamb	°C	Ambient temperature sensor
-default	Meas	Tair	italic(T)[air]	°C				Meas	Tair	Tair	°C	Tcuv			Tcuv	°C	Chamber air temperature
+default	Meas	Tair	italic(T)[air]	°C				Meas	Tair	Tair	°C				Tcuv	°C	Chamber air temperature
 default	Meas	Tleaf	italic(T)[leaf]	°C				Meas	Tleaf	Tleaf	°C	Tleaf			Tleaf	°C	Leaf thermocouple 1
 default	Meas	Tleaf2	italic(T)[leaf2]	°C				Meas	Tleaf2								Leaf thermocouple 2
 default	Meas	FanSpeed		numeric	0			Meas	Fan_speed			Imp					Chamber fan speed
@@ -268,7 +274,7 @@ default	LQConst	GreenAbsLED		numeric				LQConst	abs_greenLED								Leaf absorpt
 default	LQConst	RedAbsFlr		numeric				LQConst	abs_redFlr	RedAbs	numeric						Leaf absorptance for redFlr
 default	LQConst	RedAbsLED		numeric				LQConst	abs_redLED								Leaf absorptance for redLED
 default	LQConst	WhiteAbsLED		numeric				LQConst	abs_whiteLED								Leaf absorptance for whiteLED
-default	LQConst	ConvAmbient		J µmol-1				LQConst	k_ambient	alphaK	numeric						Converts Qin to Rabs for ambient
+default	LQConst	ConvAmbient		J µmol-1	0.19			LQConst	k_ambient	alphaK	numeric						Converts Qin to Rabs for ambient
 default	LQConst	BlueConvFlr		J µmol-1				LQConst	k_blueFlr								Converts Qin to Rabs for blueFlr
 default	LQConst	BlueConvLED		J µmol-1				LQConst	k_blueLED								Converts Qin to Rabs for blueLED
 default	LQConst	GreenConvLED		J µmol-1				LQConst	k_greenLED								Converts Qin to Rabs for greenLED

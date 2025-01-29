@@ -267,6 +267,44 @@ calcs <- function() {
              "mol*m^-2*s^-1")
         }
       ),
+      boundary_conductance = list(
+        desc = paste0("In this version, the sample is assumed to have no ",
+                      "stomata, and both the sample temperature and boundary ",
+                      "layer conductance are derived from the energy balance. ",
+                      "The reported value is always half the estimated ",
+                      "conductance, corresponding to a one-sided conductance ",
+                      "for a planer leaf."),
+        deps = "",
+        fn = function() { GasEx.gtw / 2 }
+      ),
+      boundary_conductance.li6400 = list(
+        desc = paste0("In this version, the sample is assumed to have no ",
+                      "stomata, and both the sample temperature and boundary ",
+                      "layer conductance are derived from the energy balance."),
+        deps = "",
+        fn = function() { GasEx.gtw }
+      ),
+      boundary_conductance.li6800 = list(
+        desc = paste0("In this version, the sample is assumed to have no ",
+                      "stomata, and both the sample temperature and boundary ",
+                      "layer conductance are derived from the energy balance."),
+        deps = "",
+        fn = function() { GasEx.gtw }
+      ),
+      boundary_conductance.gfs3000 = list(
+        desc = paste0("In this version, the sample is assumed to have no ",
+                      "stomata, and both the sample temperature and boundary ",
+                      "layer conductance are derived from the energy balance."),
+        deps = "",
+        fn = function() { GasEx.gtw }
+      ),
+      boundary_conductance.ciras4 = list(
+        desc = paste0("In this version, the sample is assumed to have no ",
+                      "stomata, and both the sample temperature and boundary ",
+                      "layer conductance are derived from the energy balance."),
+        deps = "",
+        fn = function() { GasEx.gtw }
+      ),
       li6400 = list(
         desc = "Li6400 specific version. Does not account for fan speed.",
         deps = "",
@@ -344,7 +382,7 @@ calcs <- function() {
                       "inside the leaf chamber."),
         deps = "",
         fn = function() {
-          P <- (Meas.Pa + Meas.DeltaPcham)@"kPa"@"mbar"@.
+          P <- (Meas.Pa + Meas.DeltaPcham)@"mbar"@.
           ((1.0007 + 3.46e-6 * P) * 0.61121 *
               exp(17.502 * GasEx.TairCnd@. / (240.97 + GasEx.TairCnd@.)))@"kPa"
         }
@@ -356,7 +394,7 @@ calcs <- function() {
         deps = "",
         fn = function() {
           tc <- GasEx.TairCnd@.
-          P <- (Meas.Pa + Meas.DeltaPcham)@"kPa"@"mbar"@.
+          P <- (Meas.Pa + Meas.DeltaPcham)@"mbar"@.
           EF <- 1 + 1e-4 * (7.2 + P * (0.0320 + 5.9e-6 * tc^2))
           (EF * (0.61121 * exp((18.678 - tc/234.5) * (tc/(257.14 + tc)))))@"kPa"
         }
@@ -368,13 +406,31 @@ calcs <- function() {
         deps = "",
         fn = function() { (LeafQ.Qin * LeafQ.Conv)@"W*m^-2" }
       ),
+      boundary_conductance = list(
+        desc = "",
+        deps = "",
+        fn = function() {
+          (LeafQ.Qin * g0(LeafQ.Conv, g0(ConvAmbient, 0.19),
+                          "J*\U00B5mol^-1"))@"W*m^-2"
+        }
+      ),
       li6400 = list(
         desc = paste0("Li6400 specific version that is corrected for",
                       "radiation leaving the chamber."),
         deps = "",
         fn = function() { ((Meas.QambIn * QConst.fQin +
                               Meas.QambOut * QConst.fQout) *
-                             LeafQ.Conv)@"W*m^-2" }
+                             LeafQ.Conv)@"W*m^-2"
+        }
+      ),
+      boundary_conductance.li6400 = list(
+        desc = paste0("Li6400 specific version that is corrected for",
+                      "radiation leaving the chamber."),
+        deps = "",
+        fn = function() { ((Meas.QambIn * QConst.fQin +
+                              Meas.QambOut * QConst.fQout) *
+                             LeafQ.Conv)@"W*m^-2"
+        }
       )
     ),
     GasEx.RHcham = list(
@@ -461,13 +517,50 @@ calcs <- function() {
         fn = function() { (GasEx.Ca * (Meas.Pa + Meas.DeltaPcham))@"Pa" }
       )
     ),
+    GasEx.lambda = list(
+      boundary_conductance = list(
+        desc = paste0("The latent heat of vaporization. This depends on",
+                      "temperature, but the effect is minor. Here a simple ",
+                      "approximation is used (Henderson-Sellers, 1984, ",
+                      "doi/10.1002/qj.49711046626). Because the EB ",
+                      "may be used to estimate the temperature, the air ",
+                      "temperature is used for this approximation."),
+        deps = "",
+        fn = function() {
+          t <- GasEx.TairCnd@"K"@"."
+          # adjusted the constant from the ref to express it per mol
+          (t / (t - 33.91))^2 * 34561.57@"J*mol^-1"
+        }
+      )
+    ),
     GasEx.LatHFlux = list(
       default = list(
         desc = "",
         deps = "",
         fn = function() {
-          # might define 44100 as a constant in future
-          44100@"W*s*mol^-1" * -GasEx.E
+          g0(GasEx.lambda, 44100, "J*mol^-1") * -GasEx.E
+        }
+      )
+    ),
+    GasEx.Cpm = list(
+      boundary_conductance = list(
+        desc = paste0("The molar heat capacity in the chamber. This equation ",
+                      "corrects for humidity and temperature, but assumes ",
+                      "21% O2 in nitrogen. See Tsilingiris 2008, ",
+                      "doi:doi.org/10.1016/j.enconman.2007.09.015"),
+        deps = "",
+        fn = function() {
+          t <- GasEx.TairCnd@"K"@"."
+          t2 <- t * t
+          wa <- Meas.H2Os@"1"@"."
+          # for air:
+          cpa <- 1.03409 - 0.284887e-3 * t + 0.7816818e-6 * t2 -
+            0.4970786e-9 * t2 * t + 0.1077024e-12 * t2 * t2
+          # for water:
+          cpv <- 5.19 - 4.319e-02 * t + 2.14e-04 * t2 - 4.871e-07 * t * t2 +
+            4.371e-10 * t2 * t2
+          # weighing:
+          (cpa * (1 - wa) * 28.966 + cpv * wa * 18.015)@"J*mol^-1*K^-1"
         }
       )
     ),
@@ -476,8 +569,8 @@ calcs <- function() {
         desc = "",
         deps = "",
         fn = function() {
-          #29.3 and 0.92 may be variable, and could be settable constants?
-          (2 * 29.3@"J*mol^-1*K^-1" * GasEx.gbw * 0.92 *
+          (2 * g0(GasEx.Cpm, 29.3, "J*mol^-1*K^-1") *
+             (GasEx.gbw / g0(Const.ra_rv, 1.082)) *
              (GasEx.TairCnd@"K" - GasEx.TleafCnd@"K"))@"W*m^-2"
         }
       )
@@ -487,8 +580,8 @@ calcs <- function() {
         desc = "",
         deps = "",
         fn = function() {
-          (2 * 0.95 * 5.67e-08@"W*K^-4*m^-2" *
-             ((Meas.Tair@"K" + LTConst.DeltaTw)^4 -
+          (2 * g0(Const.eps, 0.95) * 5.67e-08@"W*K^-4*m^-2" *
+             ((Meas.Tair@"K" + LTConst.DeltaTw@"K")^4 -
                 (GasEx.TleafCnd@"K")^4))@"W*m^-2"
         }
       )
@@ -507,14 +600,44 @@ calcs <- function() {
         desc = "",
         deps = "",
         fn = function() {
-          epssigma <-  0.95 * 5.67e-08@"W*K^-4*m^-2"
+          epssigma <-  g0(Const.eps, 0.95) * 5.67e-08@"W*K^-4*m^-2"
           Ta <- GasEx.TairCnd@"K"
-          # Tair (not TairCnd) for Tw!
-          Tw <- Meas.Tair@"K" + LTConst.DeltaTw
-          (Ta + (GasEx.Rabs + 2 * epssigma * (Tw^4 - Ta^4) + GasEx.LatHFlux) /
-              (2 * 29.3@"J*mol^-1*K^-1" * 0.92 * GasEx.gbw +
-                 8 * epssigma * Ta^3))@"degC"
+          Tw <- Meas.Tair@"K" + LTConst.DeltaTw@"K"
+          (Ta + (GasEx.Rabs + g0(Const.asH, 2) * epssigma * (Tw^4 - Ta^4) +
+                   GasEx.LatHFlux) /
+              (2 * g0(GasEx.Cpm, 29.3, "J*mol^-1*K^-1") *
+                 GasEx.gbw / g0(Const.ra_rv, 1.082) +
+                 g0(Const.asH, 2) * 4 * epssigma * Ta^3))@"degC"
         }
+      ),
+      boundary_conductance = list(
+        desc = paste0("Calculates the temperature of the sample in the chamber ",
+                     "assuming the sample has no stomata. In that case, both ",
+                     "temperature and boundary layer conductance can be ",
+                     "estimated at the same time. This is typically done ",
+                     "using filter paper. See e.g. Bristow 1987, ",
+                     "Parkinson, 1995."),
+        deps = "Buck1996",
+        fn = function() {
+          energy_balance(Meas.Tleaf, GasEx.TairCnd, GasEx.Twall,
+                         Meas.Pa + Meas.DeltaPcham, Meas.H2Os, GasEx.E,
+                         Const.RHi, GasEx.Rabs, GasEx.lambda,
+                         g0(Const.asH, 2), g0(Const.eps, 0.95),
+                         g0(Const.ra_rv, 1.082), GasEx.Cpm)$Tf@"degC"
+        }
+      )
+    ),
+    Meas.Tair = list(
+      gfs3000 = list(
+        desc = paste0("For the GFS3000, there are sensors at the top and ",
+                      "bottom of the chamber. They are averaged to estimate ",
+                      "the air temperature."),
+        deps = "",
+        fn = function() {
+          colMeans(rbind(g0(GFS3000.Ttop, NA_real_, "degC"),
+                         g0(GFS3000.Tcuv, NA_real_, "degC")),
+                   na.rm = TRUE)@"degC"
+          }
       )
     ),
     GasEx.TairCnd = list(
@@ -531,6 +654,38 @@ calcs <- function() {
         deps = "",
         fn = function() { (ifelse(LTConst.fTEB@., Meas.Tleaf,
                                   (Meas.Tleaf + Meas.Tair) / 2))@"degC" }
+      ),
+      boundary_conductance = list(
+        desc = paste0("When using the boundary_conductance calculations ",
+                      "the (first) chamber thermocouple should be ",
+                      "not touching the sample and is therefore used to ",
+                      "better estimate the air temperature."),
+        deps = "",
+        fn = function() { Meas.Tleaf }
+      ),
+      boundary_conductance.li6400 = list(
+        desc = paste0("When using the boundary_conductance calculations ",
+                      "the (first) chamber thermocouple should be ",
+                      "not touching the sample and is therefore used to ",
+                      "better estimate the air temperature."),
+        deps = "",
+        fn = function() { Meas.Tleaf }
+      )
+    ),
+    GasEx.Twall = list(
+      default = list(
+        desc = paste0("The wall temperature is required for energy balance ",
+                      "calculations and can be directly measured but set here ",
+                      "with an offset to air temperature (LTConst.DeltaTw)."),
+        deps = "",
+        fn = function() { (Meas.Tair@"K" + LTConst.DeltaTw@"K")@"degC" }
+      ),
+      boundary_conductance = list(
+        desc = paste0("The wall temperature is required for energy balance ",
+                      "calculations and can be directly measured but set here ",
+                      "with an offset to air temperature (LTConst.DeltaTw)."),
+        deps = "",
+        fn = function() { (Meas.Tair@"K" + LTConst.DeltaTw@"K")@"degC" }
       )
     ),
     GasEx.TleafCnd = list(
@@ -541,6 +696,15 @@ calcs <- function() {
           LTConst.fT1 * g0(Meas.Tleaf, -999.99, "degC", TRUE) +
             LTConst.fT2 * g0(Meas.Tleaf2, -999.99, "degC", TRUE) +
             LTConst.fTEB * g0(GasEx.TleafEB, -999.99, "degC", TRUE)
+        }
+      ),
+      boundary_conductance = list(
+        desc = paste("When using boundary_conductance, the EB is used to",
+                     "estimate both sample temperature and boundary layer",
+                     "conductance. LTConst.fT* are ignored."),
+        deps = "",
+        fn = function() {
+          g0(GasEx.TleafEB, -999.99, "degC", TRUE)
         }
       )
     ),
@@ -571,7 +735,7 @@ calcs <- function() {
                       "inside the leaf chamber."),
         deps = "",
         fn = function() {
-          ((1.0007 + 3.46e-6 * (Meas.Pa + Meas.DeltaPcham)@"kPa"@"mbar"@.) *
+          ((1.0007 + 3.46e-6 * (Meas.Pa + Meas.DeltaPcham)@"mbar"@.) *
              0.61121 * exp(17.502 * GasEx.TleafCnd@. /
                              (240.97 + GasEx.TleafCnd@.)))@"kPa"
         }
@@ -583,7 +747,7 @@ calcs <- function() {
         deps = "",
         fn = function() {
           tc <- GasEx.TleafCnd@.
-          P <- (Meas.Pa + Meas.DeltaPcham)@"kPa"@"mbar"@.
+          P <- (Meas.Pa + Meas.DeltaPcham)@"mbar"@.
           EF <- 1 + 1e-4 * (7.2 + P * (0.0320 + 5.9e-6 * tc^2))
           (EF * (0.61121 * exp((18.678 - tc / 234.5) *
                                  (tc / (257.14 + tc)))))@"kPa"
@@ -604,6 +768,18 @@ calcs <- function() {
     GasEx.gtw = list(
       default = list(
         desc = "",
+        deps = "",
+        fn = function() {
+          wi <- GasEx.SVPleaf * g0(Const.RHi, 1, "1") /
+            (Meas.Pa + Meas.DeltaPcham)
+          (GasEx.E  * (unity - (wi + Meas.H2Os) / 2) /
+              (wi - Meas.H2Os))@"mol*m^-2*s^-1"
+        }
+      ),
+      boundary_conductance = list(
+        desc = paste0("This assumes no stomata are present ",
+                      "the total conductance would equal the boundary ",
+                      "layer conductance"),
         deps = "",
         fn = function() {
           wi <- GasEx.SVPleaf * g0(Const.RHi, 1, "1") /
@@ -650,6 +826,12 @@ calcs <- function() {
           )@"mol*m^-2*s^-1"
         }
       ),
+      boundary_conductance = list(
+        desc = paste0("If boundary_conductance is set, stomata are assumed",
+                      "not to be present and the conductance is infinite."),
+        deps = "",
+        fn = function() { Inf@"mol*m^-2*s^-1" }
+      ),
       cuticular_conductance = list(
         desc = paste0("This version is based on Marquez et al. 2021, and ",
                       "accounts for cuticular conductance. It has been ",
@@ -676,6 +858,11 @@ calcs <- function() {
           gs * gb * (1 / ((Const.K + 1) * gb + gs ) + Const.K /
                        ((Const.K + 1) * gb  + Const.K * gs))
         }
+      ),
+      boundary_conductance = list(
+        desc = "This version assumes that stomata are not present",
+        deps = "",
+        fn = function() { 2 * GasEx.gbw / (1.6)^(2 / 3) }
       ),
       cuticular_conductance = list(
         desc = paste0("This version is based on ideas in Marquez et al. 2021, ",
@@ -1301,7 +1488,7 @@ calcs <- function() {
           inst <- g0(SysObs.Instrument, NA_character_)
           if (!isTRUE(all(SysObs.Instrument == "Li6400")))
             warning("\n  Applying Li6400 specific calculations to ",
-                    "rows not measured by an Li6400.\n")
+                    "rows not measured by a Li6400.\n")
           inst }
       ),
       li6800 = list(
@@ -1311,7 +1498,7 @@ calcs <- function() {
           inst <- g0(SysObs.Instrument, NA_character_)
           if (!isTRUE(all(SysObs.Instrument == "Li6800")))
             warning("\n  Applying Li6800 specific calculations to ",
-                    "rows not measured by an Li6800.\n")
+                    "rows not measured by a Li6800.\n")
           inst }
       ),
       gfs3000 = list(

@@ -17,9 +17,10 @@ test_that("check read_6800_* methods", {
                                         "FLR.qN", "FLR.qNFo", "FLR.qL",
                                         "FLR.1_qL")]
 
-  expect_equal(xlsx_eqs, xlsxdata$gasanalyzer.Equations[[1]] )
+  expect_equal(xlsx_eqs, xlsxdata$gasanalyzer.Equations[[1]],
+               ignore_attr = TRUE)
   expect_equal(xlsxdata[sys_cols], xlsxdata_norecalc[sys_cols],
-               tolerance = 1e-6)
+               tolerance = 1e-6, ignore_attr = TRUE)
   expect_equal(xlsxdata[check_cols], txtdata[check_cols],
-               tolerance = 1e-6)
+               tolerance = 1e-6, ignore_attr = TRUE)
 })

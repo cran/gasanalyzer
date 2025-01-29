@@ -187,15 +187,21 @@ read_gfs <- function(filename, tz = Sys.timezone(), unified_names = TRUE,
     # I think all GFS chambers have only one TC
     df[c("LTConst.fT1","LTConst.fT2", "LTConst.fTEB")] <- list(1, 0, 0)
 
-   #Walz version of "Dynamic"
-   if (all("GFS3000.H2Obuf" %in% names(df))) {
-     df["SysConst.UseDynamic"] <- TRUE
-     df["Dynamic.Hr"] <- o2fac * g0("GFS3000.H2Obuf", NA_real_,
+    # we estimate air and wall temp by taking the average of both sensors
+    df["Meas.Tair"] <-
+      rbind(g0("GFS3000.Ttop", NA_real_, "degC", envir = dfenv),
+            g0("GFS3000.Tcuv", NA_real_, "degC", envir = dfenv)) |>
+      colMeans(na.rm = TRUE) |> set_units("degC")
+
+    #Walz version of "Dynamic"
+    if (all("GFS3000.H2Obuf" %in% names(df))) {
+      df["SysConst.UseDynamic"] <- TRUE
+      df["Dynamic.Hr"] <- o2fac * g0("GFS3000.H2Obuf", NA_real_,
                                     envir = list2env(df))
 
-     df["Dynamic.Edyn"] <- df[["Meas.Flow"]] * (df[["Meas.H2Os"]] -
+      df["Dynamic.Edyn"] <- df[["Meas.Flow"]] * (df[["Meas.H2Os"]] -
                                                       df[["Dynamic.Hr"]]) /
-       (df[["Const.S"]] * (unity - df[["Meas.H2Os"]]))
+        (df[["Const.S"]] * (unity - df[["Meas.H2Os"]]))
       #CO2buf is rare, maybe only in some GFS versions?
       if (all("Dynamic.Crd" %in% names(df))) {
         df["Dynamic.Adyn"] <- (set_units(df[["Dynamic.Crd"]],
@@ -210,16 +216,19 @@ read_gfs <- function(filename, tz = Sys.timezone(), unified_names = TRUE,
     df[c("GFS3000.dCO2ZP", "GFS3000.dH2OZP", "GFS3000.Code", "GFS3000.dCO2MP",
          "GFS3000.dH2OMP")] <- NULL
 
-    df[zptrue, "MchEvent.Time"] <- df[zptrue, "SysObs.Time"]
-    df[zptrue, "MchEvent.HHMMSS"] <- df[zptrue, "SysObs.HHMMSS"]
-    df[zptrue, "MchEvent.CO2at"] <- df[zptrue, "Meas.CO2r"]
-    df[zptrue, "MchEvent.H2Oat"] <- df[zptrue, "Meas.H2Or"]
-    df[zptrue, "MchEvent.CO2adj"] <- df[zptrue, "Meas.CO2r"] -
-      df[zptrue, "Meas.CO2s"]
-    df[zptrue, "MchEvent.H2Oadj"] <- df[zptrue, "Meas.H2Or"] -
-      df[zptrue, "Meas.H2Os"]
-    df[zptrue, "MchEvent.Averaging"] <- df[zptrue, "SysObs.Averaging"]
-    df[zptrue, "MchStatus.Status"] <- df[zptrue, "Status.Status"]
+    # current units version (0.8-5) has UB if no ZPs at all
+    if (any(zptrue)) {
+      df[zptrue, "MchEvent.Time"] <- df[zptrue, "SysObs.Time"]
+      df[zptrue, "MchEvent.HHMMSS"] <- df[zptrue, "SysObs.HHMMSS"]
+      df[zptrue, "MchEvent.CO2at"] <- df[zptrue, "Meas.CO2r"]
+      df[zptrue, "MchEvent.H2Oat"] <- df[zptrue, "Meas.H2Or"]
+      df[zptrue, "MchEvent.CO2adj"] <- df[zptrue, "Meas.CO2r"] -
+        df[zptrue, "Meas.CO2s"]
+      df[zptrue, "MchEvent.H2Oadj"] <- df[zptrue, "Meas.H2Or"] -
+        df[zptrue, "Meas.H2Os"]
+      df[zptrue, "MchEvent.Averaging"] <- df[zptrue, "SysObs.Averaging"]
+      df[zptrue, "MchStatus.Status"] <- df[zptrue, "Status.Status"]
+    }
 
     tmp <- grepl("MchEvent", colnames(df), fixed = T)
     df[tmp] <- filldown(df[tmp])

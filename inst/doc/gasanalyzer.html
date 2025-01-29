@@ -553,13 +553,15 @@ value.</p>
 <span id="cb11-3"><a href="#cb11-3" tabindex="-1"></a>xlsxfileRecal <span class="ot">&lt;-</span> <span class="fu">recalculate</span>(xlsxfile, RecalEqs)</span>
 <span id="cb11-4"><a href="#cb11-4" tabindex="-1"></a></span>
 <span id="cb11-5"><a href="#cb11-5" tabindex="-1"></a><span class="fu">all.equal</span>(xlsxfileRecal[<span class="fu">names</span>(xlsxfile)], xlsxfile, <span class="at">tol =</span> <span class="fl">0.001</span>)</span>
-<span id="cb11-6"><a href="#cb11-6" tabindex="-1"></a><span class="co">#&gt; [1] &quot;Component \&quot;GasEx.NetTherm\&quot;: Mean relative difference: 0.0015&quot;</span></span>
-<span id="cb11-7"><a href="#cb11-7" tabindex="-1"></a><span class="co">#&gt; [2] &quot;Component \&quot;LeafQ.Qabs\&quot;: Mean relative difference: 0.096&quot;     </span></span>
-<span id="cb11-8"><a href="#cb11-8" tabindex="-1"></a><span class="co">#&gt; [3] &quot;Component \&quot;LeafQ.alpha\&quot;: Mean relative difference: 0.096&quot;    </span></span>
-<span id="cb11-9"><a href="#cb11-9" tabindex="-1"></a><span class="co">#&gt; [4] &quot;Component \&quot;FLR.QabsFs\&quot;: Mean relative difference: 0.096&quot;     </span></span>
-<span id="cb11-10"><a href="#cb11-10" tabindex="-1"></a><span class="co">#&gt; [5] &quot;Component \&quot;FLR.ETR\&quot;: Mean relative difference: 0.096&quot;        </span></span>
-<span id="cb11-11"><a href="#cb11-11" tabindex="-1"></a><span class="co">#&gt; [6] &quot;Component \&quot;FLR.phiCO2\&quot;: Mean relative difference: 0.11&quot;      </span></span>
-<span id="cb11-12"><a href="#cb11-12" tabindex="-1"></a><span class="co">#&gt; [7] &quot;Component \&quot;gasanalyzer.UseEqUnits\&quot;: 15 element mismatches&quot;</span></span></code></pre></div>
+<span id="cb11-6"><a href="#cb11-6" tabindex="-1"></a><span class="co">#&gt; [1] &quot;Component \&quot;GasEx.SenHFlux\&quot;: Mean relative difference: 0.0046&quot;</span></span>
+<span id="cb11-7"><a href="#cb11-7" tabindex="-1"></a><span class="co">#&gt; [2] &quot;Component \&quot;GasEx.NetTherm\&quot;: Mean relative difference: 0.0015&quot;</span></span>
+<span id="cb11-8"><a href="#cb11-8" tabindex="-1"></a><span class="co">#&gt; [3] &quot;Component \&quot;GasEx.EBSum\&quot;: Mean relative difference: 0.0031&quot;   </span></span>
+<span id="cb11-9"><a href="#cb11-9" tabindex="-1"></a><span class="co">#&gt; [4] &quot;Component \&quot;LeafQ.Qabs\&quot;: Mean relative difference: 0.096&quot;     </span></span>
+<span id="cb11-10"><a href="#cb11-10" tabindex="-1"></a><span class="co">#&gt; [5] &quot;Component \&quot;LeafQ.alpha\&quot;: Mean relative difference: 0.096&quot;    </span></span>
+<span id="cb11-11"><a href="#cb11-11" tabindex="-1"></a><span class="co">#&gt; [6] &quot;Component \&quot;FLR.QabsFs\&quot;: Mean relative difference: 0.096&quot;     </span></span>
+<span id="cb11-12"><a href="#cb11-12" tabindex="-1"></a><span class="co">#&gt; [7] &quot;Component \&quot;FLR.ETR\&quot;: Mean relative difference: 0.096&quot;        </span></span>
+<span id="cb11-13"><a href="#cb11-13" tabindex="-1"></a><span class="co">#&gt; [8] &quot;Component \&quot;FLR.phiCO2\&quot;: Mean relative difference: 0.11&quot;      </span></span>
+<span id="cb11-14"><a href="#cb11-14" tabindex="-1"></a><span class="co">#&gt; [9] &quot;Component \&quot;gasanalyzer.UseEqUnits\&quot;: 15 element mismatches&quot;</span></span></code></pre></div>
 <p>Small differences are found in variables as a result of the new <span class="math inline">\(\alpha\)</span> and in a value related to the
 energy balance. The latter is a result of a more precise conversion from
 Celsius to Kelvin units. Equations can be checked and modified before
@@ -568,9 +570,9 @@ use, and custom equations can be added as <code>R</code> functions:</p>
 <span id="cb12-2"><a href="#cb12-2" tabindex="-1"></a>try <span class="ot">&lt;-</span> <span class="fu">create_equations</span>(<span class="st">&quot;help&quot;</span>)</span>
 <span id="cb12-3"><a href="#cb12-3" tabindex="-1"></a><span class="co">#&gt; Warning in create_equations(&quot;help&quot;): </span></span>
 <span id="cb12-4"><a href="#cb12-4" tabindex="-1"></a><span class="co">#&gt; Valid flags are: default, li6400, li6800, gfs3000, ciras4,</span></span>
-<span id="cb12-5"><a href="#cb12-5" tabindex="-1"></a><span class="co">#&gt; cuticular_conductance, GoffGratch1946, Buck1981, Buck1996,</span></span>
-<span id="cb12-6"><a href="#cb12-6" tabindex="-1"></a><span class="co">#&gt; gfs3000_light_bot, gm_fluorescence, d13C, d13C_e_Busch2020, d13C_dis,</span></span>
-<span id="cb12-7"><a href="#cb12-7" tabindex="-1"></a><span class="co">#&gt; match, raw, O2_correction</span></span>
+<span id="cb12-5"><a href="#cb12-5" tabindex="-1"></a><span class="co">#&gt; cuticular_conductance, boundary_conductance, GoffGratch1946, Buck1981,</span></span>
+<span id="cb12-6"><a href="#cb12-6" tabindex="-1"></a><span class="co">#&gt; Buck1996, gfs3000_light_bot, gm_fluorescence, d13C, d13C_e_Busch2020,</span></span>
+<span id="cb12-7"><a href="#cb12-7" tabindex="-1"></a><span class="co">#&gt; d13C_dis, match, raw, O2_correction</span></span>
 <span id="cb12-8"><a href="#cb12-8" tabindex="-1"></a><span class="co">#&gt; Warning in create_equations(&quot;help&quot;): No valid equations found!</span></span>
 <span id="cb12-9"><a href="#cb12-9" tabindex="-1"></a></span>
 <span id="cb12-10"><a href="#cb12-10" tabindex="-1"></a><span class="co"># an equation set for gm, with a custom equation for resistance:</span></span>

@@ -36,7 +36,7 @@ test_that("check creating equations", {
                           "LeafQ.Conv", "gasanalyzer.UseFlags"))
   nms <- names(create_equations(c("gfs3000","gfs3000_light_bot")))
   expect_setequal(nms , c("SysObs.Instrument", "GasEx.gbw", "LeafQ.Qin",
-                          "gasanalyzer.UseFlags"))
+                          "Meas.Tair", "gasanalyzer.UseFlags"))
   nms <- names(create_equations("li6400"))
   expect_setequal(nms , c("SysObs.Instrument", "GasEx.gbw", "GasEx.Rabs",
                           "GasEx.TairCnd", "LeafQ.alpha",

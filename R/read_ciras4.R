@@ -98,12 +98,9 @@ read_ciras4 <- function(filename) {
   ciras[c("QConst.fQambIn", "QConst.fQambOut", "QConst.fQflr",
           "QConst.fQheadLS")] <- 0
 
-  if (!("Lcontrol" %in% names(ciras))) {
-    ciras["Lcontrol"] <- NA_character_
-  }
-  if (!("FarRed" %in% names(ciras))) {
-    ciras["FarRed"] <- set_units(0, "1")
-  }
+  ciras["Lcontrol"] <- g0("Lcontrol", NA_character_, envir = list2env(ciras))
+  # we depend on this being in % later, so force it:
+  ciras["FarRed"] <- g0("FarRed", 0, "%", TRUE, envir = list2env(ciras))
 
   ciras[c("HeadLS.Q", "Meas.QambIn", "FlrLS.Q")] <- list(
     set_units(0, "\U00B5mol*m^-2*s^-1"))
@@ -116,7 +113,7 @@ read_ciras4 <- function(filename) {
   #Q incl. farred:
   PFD <- g0("PARi", NA_real_, "\U00B5mol*m^-2*s^-1",
                      envir = list2env(ciras)) /
-    (set_units(1, "1") - ciras[["FarRed"]])
+    (1 - as.numeric(ciras[["FarRed"]]) / 100)
 
 
   # manual implies that the mass flow meter has been calibrated to this vol
@@ -159,9 +156,9 @@ read_ciras4 <- function(filename) {
     ciras[LEDrows, "QConst.fQheadLS"] <- 1
     ciras[!LEDrows, "QConst.fQambIn"] <- 1
     ciras[LEDrows, "HeadLS.Q"] <- PFD[LEDrows]
-    # i assume the FR correction is not needed for ambient...
+
     ciras[!LEDrows, "Meas.QambIn"] <- PFD[!LEDrows] *
-      (set_units(1, "1") - ciras[!LEDrows, "FarRed"])
+      (1 - as.numeric(ciras[!LEDrows, "FarRed"]) / 100)
     color_cols_new <- paste0("HeadLS.f", tolower(color_cols))
   }
 

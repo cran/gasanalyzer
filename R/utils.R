@@ -575,6 +575,95 @@ gfs_o2_factor <- function(H2O, O2) {
 
 }
 
+#' Modified Arden Buck equation
+#'
+#' This is currently only used for solving the EB for temperature and gbw
+#' simultaneously.
+#'
+#' @param Temp Temperature as double representing K
+#' @param Pres Pressure as double representing kPa
+#' @returns Saturation vapor pressure in mol fraction
+#'
+#' @noRd
+sat_vapor_pressure <- function(Tp, Ps) {
+  Tp <- Tp - 273.15
+  EF <- 1 + 1e-3 * (0.72 + Ps * (0.0320 + 5.9e-6 * Tp^2))
+  (EF * (0.61121 * exp((18.678 - Tp / 234.5) * (Tp / (257.14 + Tp))))) / Ps
+
+}
+
+#' This function can be passed to nleqslv to solve the energy balance for
+#' both temperature and boundary layer conductance. It uses the method
+#' described by Bristow 1987. The Buck equation is used to calculate
+#' the saturation vapor pressure.
+#'
+#' In the future, it could be extend to also provide a jacobian, which
+#' would vastly speed up the method.
+#'
+#' @param Tleaf a vector with the initial estimate of the sample temperature,
+#'  in units
+#' @param Tair a vector with the air temperature, in units
+#' @param Twall a vector with the chamber wall temperature, in units
+#' @param Pcham a vector with the chamber pressure, in units
+#' @param H2Os a vector with the water vapor concentration in the chamber, in
+#'   mol fraction units
+#' @param E a vector with the measured transpiration rate in the chamber, in
+#'   units
+#' @param RHi a vector with the relative humidity inside the chamber, in units
+#'   or numeric
+#' @param Rabs a vector with the absorbed short wave radiation of the sample,
+#'   in units
+#' @param lambda a vector with the latent heat of evaporation of water, in
+#'   J per mol units
+#' @param eps a vector with the emmisivity of the sample, in units or numeric
+#' @param ra_rv a vector with the ratio between heat resistance and H2O
+#'   diffusion resistance of the air, in units or numeric
+#' @param Cpm a vector with the molar heat capacity of the air in the chamber,
+#'   in J per mol per K units
+#'
+#' @returns a vector with the estimated sample temperature in Kelvin units
+#'
+#' @importFrom units set_units
+#' @importFrom nleqslv nleqslv
+#' @noRd
+energy_balance <- function(Tleaf, Tair, Twall, Pcham, H2Os, E, RHi, Rabs,
+                           lambda, asH, eps, ra_rv, Cpm) {
+  # we dispense with units for speed, but be careful to keep all
+  # EB components in W/m2
+  Tl <- as.numeric(set_units(Tleaf, "K"))
+  Ta <- as.numeric(set_units(Tair, "K"))
+  Tw4 <- as.numeric(set_units(Twall, "K"))^4
+  Pa <- as.numeric(set_units(Pcham, "kPa"))
+  wa <- as.numeric(set_units(H2Os, "1"))
+  E <- as.numeric(set_units(E, "mol*m^-2*s^-1"))
+  l <- as.numeric(set_units(lambda, "J*mol^-1"))
+  es <- as.numeric(set_units(eps, "1")) * 5.67e-08
+  cc <- as.numeric(set_units(ra_rv, "1"))
+  a <- as.numeric(set_units(asH, "1"))
+  cp <- as.numeric(set_units(Cpm, "J*mol^-1*K^-1"))
+  Ra <- as.numeric(set_units(Rabs, "W*m^-2"))
+  RHi <- as.numeric(set_units(RHi, "1"))
+
+  model <- function(x) {
+    Tf <- x[c(T, F)]
+    gb <- x[c(F, T)]
+    wi <- sat_vapor_pressure(Tf, Pa) * RHi
+    # planar leaf: a = 2 (convection and radiation on both sides)
+    # but Ra only from one side. E also happens from both sides
+    # hypo leaf: a=2, but E would be from one side? However, this is not
+    # called for leaves with stomata
+    # round leaf: a=1, meaning the gb here is a total gbw
+    EB <- Ra + a * es * (Tw4 - Tf^4) + a * cp * (Ta - Tf) * gb / cc - l * E
+    Ev <- a * gb * (wi - wa) / (1 - (wi + wa) / 2) - E
+    c(EB, Ev)
+  }
+  # pass Tair and 4 mol/m2/s as initial conditions
+  ss <- nleqslv(c(rbind(Tl, 4)), model, control = list(ftol = 1e-4))
+  data.frame(gb = set_units(ss$x[c(F, T)], "mol*m^-2*s^-1"),
+             Tf = set_units(ss$x[c(T, F)], "K"))
+
+}
+
 
 #' Render gasanalyzer variables or values using mathematical notation.
 #'
